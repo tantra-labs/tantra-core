@@ -1,6 +1,6 @@
-# `vyapaar-core` — Closed Decision Grammar Reference
+# `tantra-core` — Closed Decision Grammar Reference
 
-Documents `vyapaar-core/src/decision.rs`: the NoFX untrusted-AI closed decision
+Documents `tantra-core/src/decision.rs`: the NoFX untrusted-AI closed decision
 grammar. Language models are untrusted for direct execution — all LLM decisions
 must strictly deserialize into the closed `Decision` enum
 (`#[serde(deny_unknown_fields)]`) and pass validation before reaching the risk
@@ -70,7 +70,7 @@ surface.
 
 ## Related
 
-- `vyapaar-agent-core/src/decision.rs` — `DecisionParser` (stricter parser with
+- `tantra-agent-core/src/decision.rs` — `DecisionParser` (stricter parser with
   price-band grounding, collar checks, and the `RiskEngine` pre-trade gate).
-- `vyapaar-core/src/types.rs` — `Price`, `Quantity` (see [code-types](code-types.md)).
-- `vyapaar-core/src/order.rs` — `OrderSide` (see [code-wire-contracts](code-wire-contracts.md)).
+- `tantra-core/src/types.rs` — `Price`, `Quantity` (see [code-types](code-types.md)).
+- `tantra-core/src/order.rs` — `OrderSide` (see [code-wire-contracts](code-wire-contracts.md)).

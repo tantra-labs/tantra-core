@@ -359,7 +359,7 @@ pub struct FillReport {
     ///
     /// Defaults to zero for callers that don't yet have cost data (e.g. a
     /// simulated/paper fill). The statutory calculation itself lives in
-    /// `vyapaar-market` (`vyapaar-market-finance::india::costs`); this crate only owns
+    /// `tantra-market` (`tantra-market-finance::india::costs`); this crate only owns
     /// the contract.
     #[serde(default = "Money::zero_inr")]
     pub fee: Money,
@@ -451,7 +451,7 @@ impl FillReport {
 
 /// Itemized Indian equity/F&O transaction cost breakdown for a single fill.
 ///
-/// Each component is computed by `vyapaar-market-finance::india::costs`'s statutory
+/// Each component is computed by `tantra-market-finance::india::costs`'s statutory
 /// calculators; this type is just the shared wire shape they fill in.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct FeeBreakdown {

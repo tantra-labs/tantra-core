@@ -1,10 +1,10 @@
-//! Golden-vector and edge-case tests for `vyapaar_core::quant`.
+//! Golden-vector and edge-case tests for `tantra_core::quant`.
 //!
 //! Golden vectors are hand-computed closed-form values (or identities) so a
 //! regression in any primitive fails loudly.
 
 use rust_decimal::Decimal;
-use vyapaar_core::{QuantError, QuantSeries, *};
+use tantra_core::{QuantError, QuantSeries, *};
 
 /// Asserts `a` and `b` agree to `digits` decimal places.
 fn assert_close_dp(a: Decimal, b: Decimal, digits: u32) {

@@ -29,7 +29,7 @@ pub enum ReasonPolarity {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ReasonGroup {
-    /// Pre-trade risk gate (`vyapaar-risk`).
+    /// Pre-trade risk gate (`tantra-risk`).
     Risk,
     /// Strategy/indicator signal.
     Signal,

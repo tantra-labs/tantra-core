@@ -1,4 +1,4 @@
-# Plans Index — `vyapaar-core`
+# Plans Index — `tantra-core`
 
 Per workspace rule `.agents/rules/gap-tracking.md`:
 - **Gaps** (`docs/gaps/XXXX-*.md`): individual missing features, stubs, or rule violations.
@@ -16,7 +16,7 @@ references + implementation record); the only remaining roadmap item
 
 | # | Title | Target Scope | Status |
 |---|-------|--------------|--------|
-| [0002](0002-call-site-consolidation.md) | Call-Site Consolidation: Delegate Downstream Quant Math to `vyapaar_core::quant` | `vyapaar-core`, `vyapaar-market-indicators`, `vyapaar-agent-analytics` | Ready — tracks gap 0001 |
+| [0002](0002-call-site-consolidation.md) | Call-Site Consolidation: Delegate Downstream Quant Math to `tantra_core::quant` | `tantra-core`, `tantra-market-indicators`, `tantra-agent-analytics` | Ready — tracks gap 0001 |
 
 ## Implemented Plans
 

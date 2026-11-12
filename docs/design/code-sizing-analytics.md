@@ -1,7 +1,7 @@
-# `vyapaar-core` — Position Sizing & Statistical Validation Reference
+# `tantra-core` — Position Sizing & Statistical Validation Reference
 
-Documents `vyapaar-core/src/sizing.rs` (dynamic position sizing grammar) and
-`vyapaar-core/src/analytics/` (the statistical overfitting & tail-risk
+Documents `tantra-core/src/sizing.rs` (dynamic position sizing grammar) and
+`tantra-core/src/analytics/` (the statistical overfitting & tail-risk
 validation gates).
 
 ## Position Sizing (`sizing.rs`)
@@ -69,13 +69,13 @@ any financial calculation path.
 
 ## Tests
 
-- `vyapaar-core/tests/analytics_gates_tests.rs` — gate behavior against golden
+- `tantra-core/tests/analytics_gates_tests.rs` — gate behavior against golden
   vectors.
 
 ## Related
 
-- `vyapaar-agent-analytics` — downstream analytics crate; should delegate to
-  `vyapaar_core::quant` per gap 0001 / plan 0002.
-- `vyapaar-core/src/quant.rs` — canonical quant primitives used by sizing.
-- `vyapaar-core/src/ports.rs` — `PositionSizer` port trait
+- `tantra-agent-analytics` — downstream analytics crate; should delegate to
+  `tantra_core::quant` per gap 0001 / plan 0002.
+- `tantra-core/src/quant.rs` — canonical quant primitives used by sizing.
+- `tantra-core/src/ports.rs` — `PositionSizer` port trait
   (see [code-ports](code-ports.md)).

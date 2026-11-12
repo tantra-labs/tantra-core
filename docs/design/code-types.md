@@ -1,8 +1,8 @@
-# `vyapaar-core` — Canonical Value Objects Reference
+# `tantra-core` — Canonical Value Objects Reference
 
-Documents `vyapaar-core/src/types.rs`: the kernel's immutable, self-validating
+Documents `tantra-core/src/types.rs`: the kernel's immutable, self-validating
 value objects. Every type here is the single source of truth for its domain
-concept across all Vyapaar bounded contexts.
+concept across all Tantra bounded contexts.
 
 ## `Exchange`
 
@@ -113,7 +113,7 @@ pub struct PriceBand {
 - `Currency::from_code(code)` — case-insensitive ISO 4217 parse
   (`CoreError::InvalidCurrency` on unknown).
 - `MinorUnit { singular, plural }` — the display names table, shared by the
-  Python SDK through `vyapaar._vyapaar.currency_minor_units`.
+  Python SDK through `tantra._tantra.currency_minor_units`.
 
 ## `CountryCode`
 
@@ -133,8 +133,8 @@ validate the non-negative invariant at the boundary.
 
 ## Related
 
-- `vyapaar-core/src/ids.rs` — `ClientOrderId`, `AlgoId`, `AccountId`, `TransactionId`.
-- `vyapaar-core/src/error.rs` — the `CoreError` taxonomy used by all the above.
-- `vyapaar-core/src/instrument.rs` — `Instrument` reference data that keys on `InstrumentId`.
-- `vyapaar-core/src/market.rs` — `Tick`, `Bar`, `DepthLevel`.
-- `vyapaar-core/src/order.rs` — `OrderRequest`, `FillReport`, `FeeBreakdown`.
+- `tantra-core/src/ids.rs` — `ClientOrderId`, `AlgoId`, `AccountId`, `TransactionId`.
+- `tantra-core/src/error.rs` — the `CoreError` taxonomy used by all the above.
+- `tantra-core/src/instrument.rs` — `Instrument` reference data that keys on `InstrumentId`.
+- `tantra-core/src/market.rs` — `Tick`, `Bar`, `DepthLevel`.
+- `tantra-core/src/order.rs` — `OrderRequest`, `FillReport`, `FeeBreakdown`.

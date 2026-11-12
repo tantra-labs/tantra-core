@@ -1,7 +1,7 @@
 //! Portfolio snapshot wire contracts.
 //!
-//! These cross the Heart engine (`vyapaar-ledger`) → House API (`vyapaar-runtime`) →
-//! Face UI (`vyapaar-ui`) boundary, so they're Kernel wire types, not
+//! These cross the Heart engine (`tantra-ledger`) → House API (`tantra-runtime`) →
+//! Face UI (`tantra-ui`) boundary, so they're Kernel wire types, not
 //! ledger-internal engine state.
 
 use chrono::{DateTime, Utc};

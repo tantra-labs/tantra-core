@@ -3,7 +3,7 @@
 use schemars::schema_for;
 use serde_json::Value;
 use std::fs;
-use vyapaar_core::*;
+use tantra_core::*;
 
 #[test]
 fn test_all_canonical_types_implement_valid_json_schema() {

@@ -1,8 +1,8 @@
 //! Canonical quant transform primitives: returns, volatility, rolling stats.
 //!
 //! This is the single canonical home for the pure, zero-I/O numeric transforms
-//! that downstream crates (`vyapaar-market-indicators`, `vyapaar-agent-analytics`,
-//! `vyapaar-runtime-backtest`, and the future `vyapaar-ledger-allocation`
+//! that downstream crates (`tantra-market-indicators`, `tantra-agent-analytics`,
+//! `tantra-runtime-backtest`, and the future `tantra-ledger-allocation`
 //! covariance/return inputs) have historically each re-derived locally:
 //!
 //! - period-over-period **simple** and **log** returns
@@ -14,7 +14,7 @@
 //!
 //! Everything here is pure math over exact [`Decimal`] values: no network, no
 //! filesystem, no clock queries, matching the zero-I/O domain-purity invariant
-//! of the rest of `vyapaar-core`. Replaying the same series produces the same
+//! of the rest of `tantra-core`. Replaying the same series produces the same
 //! result byte-for-byte.
 //!
 //! # Zero-floats note

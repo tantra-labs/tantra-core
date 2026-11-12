@@ -1,4 +1,4 @@
-# `vyapaar-core` — Wire Contracts Reference (Instrument, Market, Order, Portfolio, Screener, Signal, Calendar)
+# `tantra-core` — Wire Contracts Reference (Instrument, Market, Order, Portfolio, Screener, Signal, Calendar)
 
 Documents the canonical wire-contract modules not covered by dedicated docs:
 `instrument.rs`, `market.rs`, `order.rs`, `portfolio.rs`, `screener.rs`,
@@ -77,7 +77,7 @@ price component.
 | `CancelRequest` | Cancel an order: `instrument`, `client_order_id: Uuid`, optional `algo_id`, `client_id`. |
 | `OrderAck` | Broker ack: `order_id`, `client_order_id`, optional `exchange_order_id`, `status`, `timestamp`, optional `correlation_id` / `client_id` / `trace_context`. |
 | `FillReport` | Execution confirmation: `fill_id`, `order_id`, `client_order_id`, `instrument`, `side`, `price`, `quantity`, `algo_id`, `timestamp`, `account_id`, `fee: Money` (defaults `zero_inr`), optional `fee_breakdown`, `trace_context`. Builders: `with_fee`, `with_fee_breakdown` (sets `fee` to the breakdown total), `with_account_id`. |
-| `FeeBreakdown` | Itemized Indian equity/F&O transaction costs: `brokerage`, `stt`, `exchange_charges`, `gst`, `stamp_duty`, `sebi_charges` (all `Money`); `total()` sums them. The statutory calculation itself lives in `vyapaar-market-finance::india::costs` — the kernel owns only the wire shape. |
+| `FeeBreakdown` | Itemized Indian equity/F&O transaction costs: `brokerage`, `stt`, `exchange_charges`, `gst`, `stamp_duty`, `sebi_charges` (all `Money`); `total()` sums them. The statutory calculation itself lives in `tantra-market-finance::india::costs` — the kernel owns only the wire shape. |
 
 ### `OrderEvent` / `OrderEventKind`
 
@@ -94,8 +94,8 @@ Tag-only and full lifecycle stream types (snake_case):
 
 ## Portfolio Snapshots (`portfolio.rs`)
 
-Wire contracts crossing the Heart (`vyapaar-ledger`) → House (`vyapaar-runtime`)
-→ Face (`vyapaar-ui`) boundary:
+Wire contracts crossing the Heart (`tantra-ledger`) → House (`tantra-runtime`)
+→ Face (`tantra-ui`) boundary:
 
 | Type | Fields |
 |------|--------|
@@ -143,7 +143,7 @@ are explicit `DateTime<Utc>` fields. None of these modules performs I/O.
 
 ## Related
 
-- `vyapaar-core/src/events.rs` / `wire.rs` — see [code-events](code-events.md)
+- `tantra-core/src/events.rs` / `wire.rs` — see [code-events](code-events.md)
   (`DomainEvent`, `ExecutionEvent`, `TraceContext`).
-- `vyapaar-core/src/ports.rs` — the hexagonal ports that consume these
+- `tantra-core/src/ports.rs` — the hexagonal ports that consume these
   contracts — see [code-ports](code-ports.md).

@@ -1,8 +1,8 @@
-# व्यापार・核心 vyapaar-core
+# व्यापार・核心 tantra-core
 
 > *Shared Kernel: Canonical Decimal value objects, InstrumentId, Tick, Order, Decision, and OpenAPI schemas.*
 
-Foundational zero-float domain types, invariants, and serialization contracts shared across all Vyapaar subsystems.
+Foundational zero-float domain types, invariants, and serialization contracts shared across all Tantra subsystems.
 
 ## Architecture
 

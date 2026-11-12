@@ -1,4 +1,4 @@
-# `vyapaar-core` Agent Guidelines & Architecture Invariants
+# `tantra-core` Agent Guidelines & Architecture Invariants
 
 **Subsystem**: Kernel (Shared Kernel)
 **Language**: Rust
@@ -7,8 +7,8 @@
 ---
 
 ## 1. Role & Architectural Hints
-* `vyapaar-core` is the foundational kernel for the entire Vyapaar ecosystem. All other Rust crates (`vyapaar-ledger`, `vyapaar-risk`, `vyapaar-market`, `vyapaar-exec`, `vyapaar-runtime`, `vyapaar-agent`, `vyapaar-ffi`, `vyapaar-ui`) depend on `vyapaar-core`.
-* **Zero-I/O Domain Purity**: `vyapaar-core` must NEVER perform I/O (no network, no disk, no system clock queries).
+* `tantra-core` is the foundational kernel for the entire Tantra ecosystem. All other Rust crates (`tantra-ledger`, `tantra-risk`, `tantra-market`, `tantra-exec`, `tantra-runtime`, `tantra-agent`, `tantra-ffi`, `tantra-ui`) depend on `tantra-core`.
+* **Zero-I/O Domain Purity**: `tantra-core` must NEVER perform I/O (no network, no disk, no system clock queries).
 * **Single Source of Truth for Wire Contracts**:
   - All public wire types derive `JsonSchema` via `schemars`.
   - OpenAPI 3.1 specifications, JSON schemas, and MCP tool schemas are deterministically generated from these types.

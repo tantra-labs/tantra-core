@@ -1,6 +1,6 @@
-# `vyapaar-core` — Domain Events & Trace Context Reference
+# `tantra-core` — Domain Events & Trace Context Reference
 
-Documents `vyapaar-core/src/events.rs` and `vyapaar-core/src/wire.rs`: the
+Documents `tantra-core/src/events.rs` and `tantra-core/src/wire.rs`: the
 authoritative cross-subsystem domain events and the W3C trace context carrier.
 
 ## `DomainEvent` (`events.rs`)
@@ -77,10 +77,10 @@ Timestamps are explicit `DateTime<Utc>` parameters, never `SystemTime::now()`.
 
 ## Related
 
-- `vyapaar-core/src/order.rs` — `OrderEvent`/`OrderEventKind` and `FillReport`
+- `tantra-core/src/order.rs` — `OrderEvent`/`OrderEventKind` and `FillReport`
   (see [code-wire-contracts](code-wire-contracts.md)).
-- `vyapaar-core/src/sizing.rs` — `PositionSizingRequest`/`PositionSizingResult`.
-- `vyapaar-agent-core/src/decision.rs` — `DecisionParser` validates
-  `vyapaar_core::Decision` before the risk gate.
-- `vyapaar-ledger` — consumes `FillReport`/`DomainEvent` for the double-entry
+- `tantra-core/src/sizing.rs` — `PositionSizingRequest`/`PositionSizingResult`.
+- `tantra-agent-core/src/decision.rs` — `DecisionParser` validates
+  `tantra_core::Decision` before the risk gate.
+- `tantra-ledger` — consumes `FillReport`/`DomainEvent` for the double-entry
   FIFO ledger.

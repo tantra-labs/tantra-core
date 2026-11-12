@@ -3,7 +3,7 @@ use rust_decimal::Decimal;
 use std::str::FromStr;
 use std::sync::Arc;
 use uuid::Uuid;
-use vyapaar_core::*;
+use tantra_core::*;
 
 fn instrument() -> InstrumentId {
     InstrumentId::new(Exchange::Nse, "RELIANCE")
@@ -721,7 +721,7 @@ fn test_position_sizer_hexagonal_port_object_safe() {
             &self,
             request: &PositionSizingRequest,
         ) -> Result<PositionSizingResult, PortError> {
-            vyapaar_core::sizing::calculate_position_size(request)
+            tantra_core::sizing::calculate_position_size(request)
                 .map_err(|e| PortError::CalculationFailed(e.to_string()))
         }
     }

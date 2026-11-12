@@ -18,7 +18,7 @@ use crate::analytics::stats::sharpe_or_zero;
 pub struct CostStressConfig {
     /// One-step transaction-cost drag per period, as a fraction of capital
     /// (default `0.0002` = 2 bps). Callers may pass the exact-per-bar drag
-    /// derived from `vyapaar-market-finance::india::costs` instead.
+    /// derived from `tantra-market-finance::india::costs` instead.
     pub cost_per_period: Decimal,
     /// Annualization factor (default `252`).
     pub annualization_factor: Decimal,

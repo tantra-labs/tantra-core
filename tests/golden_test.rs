@@ -1,5 +1,5 @@
 use std::fs;
-use vyapaar_core::*;
+use tantra_core::*;
 
 #[test]
 fn test_golden_vector_tick_ltp() {

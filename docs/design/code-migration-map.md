@@ -1,10 +1,10 @@
-# `vyapaar-core` — Implementation Record (honba-core → vyapaar-core)
+# `tantra-core` — Implementation Record (honba-core → tantra-core)
 
 > **Tier**: Tier 0 (Execute First — Zero Internal Dependencies)
 > **Status**: Migration complete; plan 0001 (quant primitives) and the analytics
 > gates merged.
 
-This document records how the `vyapaar-core` Shared Kernel came to be and the
+This document records how the `tantra-core` Shared Kernel came to be and the
 TDD/DDD corrections applied during the migration and subsequent plan work. The
 workspace's `honba-core` source tree was the origin of most modules; the kernel
 was re-implemented against the Tier 0 contract with the strict invariants below.

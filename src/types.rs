@@ -11,7 +11,7 @@ use crate::error::CoreError;
 /// Supported exchanges in the Indian market.
 ///
 /// This is the canonical [`Exchange`] vocabulary: downstream bounded contexts
-/// (`vyapaar-ledger`, `vyapaar-market`, `vyapaar-exec`) must never redefine
+/// (`tantra-ledger`, `tantra-market`, `tantra-exec`) must never redefine
 /// their own exchange enums, only re-use this one.
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, JsonSchema,
@@ -374,7 +374,7 @@ pub struct MinorUnit {
 /// Currency enum.
 ///
 /// The minor-unit table lives here, in the kernel, so every consumer (Rust
-/// crates, the Python SDK through `vyapaar._vyapaar.currency_minor_units`) reads one
+/// crates, the Python SDK through `tantra._tantra.currency_minor_units`) reads one
 /// table instead of keeping its own copy.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema, Default)]
 pub enum Currency {

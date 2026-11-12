@@ -1,4 +1,4 @@
-# HANDOFF — vyapaar-core
+# HANDOFF — tantra-core
 
 **Status**: Tier 0 complete; plan 0001 + analytics gates merged. Docs rewritten
 this change.
@@ -24,13 +24,13 @@ this change.
 - Zero-I/O purity + zero inline tests in `src/` verified.
 - Wire contracts: `SCHEMA_VERSION = 8`, `API_VERSION = "v1"`; generated schema
   files are never hand-edited (`make codegen`).
-- Gap 0001 open: `vyapaar-market-indicators` / `vyapaar-agent-analytics` still
+- Gap 0001 open: `tantra-market-indicators` / `tantra-agent-analytics` still
   re-derive return/vol/Sharpe/drawdown locally instead of delegating to
-  `vyapaar_core::quant`.
+  `tantra_core::quant`.
 
 ## Immediate Next Step
 - Execute plan `0002` (gap 0001): audit downstream local math, delegate to
-  `vyapaar_core::quant`, add parity tests on shared golden vectors.
+  `tantra_core::quant`, add parity tests on shared golden vectors.
 
 ## Operating Invariants
 - Canonical profile `prod`: `cargo build/check/test --profile prod`.

@@ -5,7 +5,7 @@ use proptest::prelude::*;
 use rust_decimal::Decimal;
 use std::str::FromStr;
 use uuid::Uuid;
-use vyapaar_core::*;
+use tantra_core::*;
 
 proptest! {
     // 1. Dimensional invariant: Price * Quantity = Money

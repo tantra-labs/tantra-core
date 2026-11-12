@@ -2,15 +2,15 @@
 //!
 //! Promoted into the Shared Kernel (Tier 0) from the Domain Heart's
 //! in-memory repository layer, so that every bounded context —
-//! [`vyapaar-ledger`], [`vyapaar-risk`], [`vyapaar-market`], and
-//! [`vyapaar-exec`] — shares identical, strongly-typed IDs instead of
+//! [`tantra-ledger`], [`tantra-risk`], [`tantra-market`], and
+//! [`tantra-exec`] — shares identical, strongly-typed IDs instead of
 //! redefining private stringly-typed duplicates (split-brain ubiquitous
 //! language fix).
 //!
-//! [`vyapaar-ledger`]: ../../vyapaar-ledger/index.html
-//! [`vyapaar-risk`]: ../../vyapaar-risk/index.html
-//! [`vyapaar-market`]: ../../vyapaar-market/index.html
-//! [`vyapaar-exec`]: ../../vyapaar-exec/index.html
+//! [`tantra-ledger`]: ../../tantra-ledger/index.html
+//! [`tantra-risk`]: ../../tantra-risk/index.html
+//! [`tantra-market`]: ../../tantra-market/index.html
+//! [`tantra-exec`]: ../../tantra-exec/index.html
 
 use std::fmt;
 

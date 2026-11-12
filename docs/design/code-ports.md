@@ -1,7 +1,7 @@
-# `vyapaar-core` — Hexagonal Port Traits Reference
+# `tantra-core` — Hexagonal Port Traits Reference
 
-Documents `vyapaar-core/src/ports.rs`: object-safe hexagonal port traits
-(interfaces only, no implementations). `vyapaar-core` is zero-I/O — these traits
+Documents `tantra-core/src/ports.rs`: object-safe hexagonal port traits
+(interfaces only, no implementations). `tantra-core` is zero-I/O — these traits
 are abstract contracts implemented in downstream crates and injected as
 `Arc<dyn Trait>`.
 
@@ -81,7 +81,7 @@ network/disk access. Every trait is object-safe for `Arc<dyn Trait>` injection.
 
 ## Related
 
-- `vyapaar-core/src/sizing.rs` — `PositionSizingRequest`, `PositionSizingResult`,
+- `tantra-core/src/sizing.rs` — `PositionSizingRequest`, `PositionSizingResult`,
   `SizingMethod`, `RiskBudget` (see [code-sizing-analytics](code-sizing-analytics.md)).
-- `vyapaar-core/src/market.rs` — `Tick`, `Bar`, `DepthLevel`.
-- `vyapaar-core/src/order.rs` — `OrderRequest`, `ModifyRequest`, `OrderAck`.
+- `tantra-core/src/market.rs` — `Tick`, `Bar`, `DepthLevel`.
+- `tantra-core/src/order.rs` — `OrderRequest`, `ModifyRequest`, `OrderAck`.

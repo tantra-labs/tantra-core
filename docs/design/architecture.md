@@ -1,10 +1,10 @@
-# `vyapaar-core` — DDD Architecture & Shared Kernel Specification
+# `tantra-core` — DDD Architecture & Shared Kernel Specification
 
 ## 1. Bounded Context & Responsibility
 
-`vyapaar-core` is the **Shared Kernel (Tier 0)** of the Vyapaar Labs
-ecosystem. Every Rust crate and the Python FFI boundary (`vyapaar-ffi`) depend
-on `vyapaar-core`, while `vyapaar-core` depends on **zero internal crates** and
+`tantra-core` is the **Shared Kernel (Tier 0)** of the Tantra Labs
+ecosystem. Every Rust crate and the Python FFI boundary (`tantra-ffi`) depend
+on `tantra-core`, while `tantra-core` depends on **zero internal crates** and
 performs **zero I/O** (no network, no filesystem, no clock queries — timestamps
 are explicit `DateTime<Utc>` parameters).
 
@@ -30,7 +30,7 @@ The kernel owns the ubiquitous language:
 ## 3. Module Map
 
 ```
-vyapaar-core/src/
+tantra-core/src/
 ├── lib.rs            # Re-exports + SCHEMA_VERSION (v8) + API_VERSION (v1)
 ├── error.rs          # CoreError taxonomy
 ├── ids.rs            # ClientOrderId, AlgoId, AccountId, TransactionId
@@ -104,9 +104,9 @@ make fmt       # cargo fmt
 
 ### What Remains
 
-- **Call-site consolidation** — downstream crates (`vyapaar-market-indicators`,
-  `vyapaar-agent-analytics`) still re-derive returns/vol/Sharpe/drawdown locally
-  instead of delegating to `vyapaar_core::quant`; tracked by
+- **Call-site consolidation** — downstream crates (`tantra-market-indicators`,
+  `tantra-agent-analytics`) still re-derive returns/vol/Sharpe/drawdown locally
+  instead of delegating to `tantra_core::quant`; tracked by
   [gap 0001](../gaps/0001-call-site-consolidation.md) /
   [plan 0002](../plans/0002-call-site-consolidation.md).
 

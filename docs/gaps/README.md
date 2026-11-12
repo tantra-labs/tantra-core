@@ -1,4 +1,4 @@
-# Gap Index — `vyapaar-core`
+# Gap Index — `tantra-core`
 
 Per workspace rule `.agents/rules/gap-tracking.md`:
 - **Gaps** (`docs/gaps/XXXX-*.md`): individual missing features, stubs, or rule violations.
@@ -9,7 +9,7 @@ Per workspace rule `.agents/rules/gap-tracking.md`:
 
 | # | Title | Severity | Status | Plan |
 |---|-------|----------|--------|------|
-| [0001](0001-call-site-consolidation.md) | Phase 2 call-site consolidation: delegate `vyapaar-market-indicators` / `vyapaar-agent-analytics` return/vol math to `vyapaar_core::quant` | Medium | Open | [0002](../plans/0002-call-site-consolidation.md) |
+| [0001](0001-call-site-consolidation.md) | Phase 2 call-site consolidation: delegate `tantra-market-indicators` / `tantra-agent-analytics` return/vol math to `tantra_core::quant` | Medium | Open | [0002](../plans/0002-call-site-consolidation.md) |
 
 ## Closed Gaps
 

@@ -1,6 +1,6 @@
-//! # व्यापार・核 vyapaar-core
+//! # व्यापार・核 tantra-core
 //!
-//! Shared-kernel canonical types for the Vyapaar Indian equities trading platform.
+//! Shared-kernel canonical types for the Tantra Indian equities trading platform.
 //!
 //! The kernel is deliberately slim: it owns only the ubiquitous language —
 //! value objects, aggregate IDs, wire contracts, the closed [`Decision`]
@@ -100,18 +100,18 @@ pub use wire::TraceContext;
 /// v6: added instrument master data, portfolio snapshots, signals, the
 /// screener, cross-subsystem domain events, and the `ports` module —
 /// the real home for symbols that used to live in the now-empty
-/// `vyapaar-ledger-{entities,messages,ports}` marker crates.
+/// `tantra-ledger-{entities,messages,ports}` marker crates.
 ///
 /// v7: added `FillReport::fee`/`fee_breakdown` (`FeeBreakdown`) — the
 /// contract for per-fill transaction costs; the statutory calculation
-/// itself lives in `vyapaar-market-finance::india::costs`.
+/// itself lives in `tantra-market-finance::india::costs`.
 ///
 /// v8: added dynamic position sizing contracts (`SizingMethod`, `RiskBudget`,
 /// `PositionSizingRequest`, `PositionSizingResult`, `PositionSizer`), enriched
 /// `Signal` with execution/stop levels, first-class tactical `DomainEvent`
 /// aggregate envelope, and W3C `TraceContext` distributed observability carrier.
 ///
-/// Migration note (Tier 0, `honba-core` → `vyapaar-core`, still wire-compatible
+/// Migration note (Tier 0, `honba-core` → `tantra-core`, still wire-compatible
 /// with v8): added the canonical aggregate IDs module (`ids`), `Exchange::{Nfo,
 /// Cds}` variants, and hardened `Price`/`Quantity` deserialization to reject
 /// negative values at the serde boundary. All v8 payloads deserialize

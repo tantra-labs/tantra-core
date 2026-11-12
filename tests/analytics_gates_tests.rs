@@ -1,4 +1,4 @@
-//! Statistical validation gate tests (`vyapaar_core::analytics`) — GAP-0002.
+//! Statistical validation gate tests (`tantra_core::analytics`) — GAP-0002.
 //!
 //! Reference expectations follow the Honba validation engine
 //! (`honba-analytics`: `validation.rs`, `pbo.rs`, `walk_forward.rs`,
@@ -7,14 +7,14 @@
 
 use rust_decimal::Decimal;
 
-use vyapaar_core::analytics::cost_stress::{CostStressConfig, compute_cost_stress};
-use vyapaar_core::analytics::distribution::{SplitMix64, norm_inv};
-use vyapaar_core::analytics::dsr::{DsrConfig, compute_dsr, expected_max_sharpe};
-use vyapaar_core::analytics::holdout::{HoldoutConfig, compute_holdout};
-use vyapaar_core::analytics::monte_carlo::{MonteCarloConfig, run_block_bootstrap};
-use vyapaar_core::analytics::pbo::{PboConfig, compute_pbo};
-use vyapaar_core::analytics::walk_forward::{WalkForwardConfig, compute_walk_forward};
-use vyapaar_core::analytics::{ValidationBlock, stats};
+use tantra_core::analytics::cost_stress::{CostStressConfig, compute_cost_stress};
+use tantra_core::analytics::distribution::{SplitMix64, norm_inv};
+use tantra_core::analytics::dsr::{DsrConfig, compute_dsr, expected_max_sharpe};
+use tantra_core::analytics::holdout::{HoldoutConfig, compute_holdout};
+use tantra_core::analytics::monte_carlo::{MonteCarloConfig, run_block_bootstrap};
+use tantra_core::analytics::pbo::{PboConfig, compute_pbo};
+use tantra_core::analytics::walk_forward::{WalkForwardConfig, compute_walk_forward};
+use tantra_core::analytics::{ValidationBlock, stats};
 
 fn dec(value: &str) -> Decimal {
     value.parse().expect("valid decimal literal")

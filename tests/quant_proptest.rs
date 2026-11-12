@@ -1,8 +1,8 @@
-//! Property-based invariants for `vyapaar_core::quant` primitives.
+//! Property-based invariants for `tantra_core::quant` primitives.
 
 use proptest::prelude::*;
 use rust_decimal::Decimal;
-use vyapaar_core::{
+use tantra_core::{
     QuantSeries, beta, correlation, log_returns, max_drawdown, rolling_mean, simple_returns,
 };
 

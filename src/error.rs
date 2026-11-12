@@ -1,4 +1,4 @@
-//! Error types for vyapaar-core.
+//! Error types for tantra-core.
 
 use thiserror::Error;
 

@@ -1,6 +1,6 @@
 //! Hexagonal port traits (interfaces only, no implementations).
 //!
-//! `vyapaar-core` stays zero-I/O (`AGENTS.md` §2.5): these traits are abstract
+//! `tantra-core` stays zero-I/O (`AGENTS.md` §2.5): these traits are abstract
 //! contracts, not implementations. Real market-data connectors, execution
 //! gateways, and position sizers live in downstream crates or default pure kernels,
 //! injected as `Arc<dyn Trait>` per `AGENTS.md` §2.1. Every trait here is

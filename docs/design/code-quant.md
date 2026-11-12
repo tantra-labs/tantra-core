@@ -1,9 +1,9 @@
-# `vyapaar-core` — Canonical Quant Transform Primitives Reference
+# `tantra-core` — Canonical Quant Transform Primitives Reference
 
-Documents `vyapaar-core/src/quant.rs`: the single canonical home for pure,
+Documents `tantra-core/src/quant.rs`: the single canonical home for pure,
 zero-I/O numeric transforms over exact `Decimal` values. Downstream crates
-(`vyapaar-market-indicators`, `vyapaar-agent-analytics`,
-`vyapaar-runtime-backtest`, and the future `vyapaar-ledger-allocation`) should
+(`tantra-market-indicators`, `tantra-agent-analytics`,
+`tantra-runtime-backtest`, and the future `tantra-ledger-allocation`) should
 delegate to these rather than re-deriving locally — tracked by
 [gap 0001](../gaps/0001-call-site-consolidation.md) /
 [plan 0002](../plans/0002-call-site-consolidation.md).
@@ -61,11 +61,11 @@ is zero-I/O: no network, filesystem, or clock queries.
 
 ## Tests
 
-- `vyapaar-core/tests/quant_tests.rs` — 33 golden-vector tests.
-- `vyapaar-core/tests/quant_proptest.rs` — property-based invariants.
+- `tantra-core/tests/quant_tests.rs` — 33 golden-vector tests.
+- `tantra-core/tests/quant_proptest.rs` — property-based invariants.
 
 ## Related
 
 - Gap 0001 / Plan 0002 — call-site consolidation to delegate downstream math here.
-- `vyapaar-core/src/analytics/` — statistical gates that build on similar math
+- `tantra-core/src/analytics/` — statistical gates that build on similar math
   (see [code-sizing-analytics](code-sizing-analytics.md)).
