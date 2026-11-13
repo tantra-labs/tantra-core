@@ -17,6 +17,7 @@ references + implementation record); the only remaining roadmap item
 | # | Title | Target Scope | Status |
 |---|-------|--------------|--------|
 | [0002](0002-call-site-consolidation.md) | Call-Site Consolidation: Delegate Downstream Quant Math to `tantra_core::quant` | `tantra-core`, `tantra-market-indicators`, `tantra-agent-analytics` | Ready — tracks gap 0001 |
+| [0003](0003-intraday-level-map-domain-types.md) | Intraday Level-Map, Options-Positioning & Stop-Protection Domain Types (Elephant Edge EE+) | `tantra-core` | Proposed — tracks gap 0002; master plan root `docs/plans/0005` |
 
 ## Implemented Plans
 
