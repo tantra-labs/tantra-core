@@ -1,6 +1,13 @@
 # Gap 0001 — Phase 2 Call-Site Consolidation: `tantra_core::quant` Delegation
 
-**Status**: open — tracked by [plan 0002](../plans/0002-call-site-consolidation.md)
+**Status**: open — tracked by [plan 0002](../plans/0002-call-site-consolidation.md).
+  Phase A audit (2026-11-13) found **no 1:1 delegation sites** in the two named crates; the
+  delegation matrix and verdict live in [`docs/design/code-quant.md`](../design/code-quant.md).
+  This gap is kept open as a "verify on future work" item rather than a rewrite: neither
+  `tantra-market-indicators` (streaming, f64) nor `tantra-agent-analytics` (statistical, f64)
+  re-derives a transform with semantics/type policy compatible with the Decimal-batch `quant`
+  API. A clean wiring point exists only when a future Decimal-bounded performance-stat consumer
+  (e.g. `tantra-ledger-performance` parity vectors) appears — see the audit note.
 
 ## What's Stubbed or Duplicated
 

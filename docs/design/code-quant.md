@@ -64,6 +64,28 @@ is zero-I/O: no network, filesystem, or clock queries.
 - `tantra-core/tests/quant_tests.rs` — 33 golden-vector tests.
 - `tantra-core/tests/quant_proptest.rs` — property-based invariants.
 
+## Downstream call-site audit (plan 0002 Phase A — 2026-11-13)
+
+Audit of the two crates named by gap 0001 for local re-derivations of the transforms above.
+**Finding: there are no 1:1 delegation sites** — neither crate re-derives a transform with
+compatible semantics and type policy, so no in-place replacement was made. Delegation remains
+a "revisit when a new Decimal-bounded quant consumer appears" item, not a mechanical rewrite.
+
+| Downstream site | Local math | quant equivalent | Delegation verdict |
+|---|---|---|---|
+| `tantra-market-indicators/src/sma.rs` `Sma::update` | streaming O(1) ring-buffer SMA over `f64` | `rolling_mean` (batch, `Decimal`) | Not applicable — stateful streaming indicator (f64 by policy); batch/Decimal delegate would break O(1) updates and change warm-up semantics |
+| `tantra-market-indicators/src/ema.rs`, `rma.rs`, `rsi.rs`, `atr.rs`, `bollinger.rs`, `stochastic.rs` | streaming EWMA / rolling stats over `f64` | `rolling_stdev` / `ewma_volatility` (batch, `Decimal`) | Not applicable — same streaming/batch + type-policy mismatch |
+| `tantra-agent-analytics/src/math.rs` `mean`, `variance` | batch f64 sample stats | `rolling_mean` / `rolling_stdev` (windowed, `Decimal`) | Not applicable — different shape (plain vs windowed) and type policy |
+| `tantra-agent-analytics/src/equity_stats.rs` `EquityStats::from_returns` | f64 annualized vol, annualized risk-free-adjusted Sharpe, Sortino, Calmar, max drawdown | `sharpe_ratio`, `max_drawdown` (non-annualized, `Decimal`) | Not a drop-in — extra annualization/sortino/calmar semantics; f64-internal compute policy documented |
+| `tantra-agent-analytics/src/{dsr,monte_carlo,pbo,validation,cointegration,volatility}.rs` | f64 statistical gates, GARCH | none overlapping | Not applicable — no quant equivalents |
+
+**Why**: `tantra_core::quant` is pure-`Decimal`, batch, zero-I/O; the two downstream crates are
+f64-internal by documented policy (`market-indicators` streaming, `agent-analytics`
+statistical). Forcing delegation would require converting both crates' compute policy and
+changing public behavior — out of scope for a consolidation gap. If a future consumer needs
+Decimal-bounded performance stats (e.g. `tantra-ledger-performance` parity vectors), that is the
+place to wire `quant::sharpe_ratio`/`max_drawdown` with parity tests.
+
 ## Related
 
 - Gap 0001 / Plan 0002 — call-site consolidation to delegate downstream math here.

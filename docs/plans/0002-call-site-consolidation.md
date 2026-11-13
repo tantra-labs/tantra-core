@@ -1,6 +1,11 @@
 # Plan 0002 — Call-Site Consolidation: Delegate Downstream Quant Math to `tantra_core::quant`
 
-**Status**: ready for implementation
+**Status**: **Phase A (audit) complete 2026-11-13** — no 1:1 delegation sites found in the
+  named downstream crates (streaming f64 indicators vs batch Decimal quant; f64 statistical
+  gates vs Decimal quant). Delegation matrix in `docs/design/code-quant.md`. Phases B–C
+  (replace math + parity tests) are **not applicable** to the current downstream crates; the
+  plan's wiring point moves to future Decimal-bounded quant consumers (e.g.
+  `tantra-ledger-performance` parity vectors). Gap 0001 stays open as verify-on-future-work.
 
 ## 0. Objective
 
