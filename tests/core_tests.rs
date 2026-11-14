@@ -2,8 +2,8 @@ use chrono::{Datelike, Utc};
 use rust_decimal::Decimal;
 use std::str::FromStr;
 use std::sync::Arc;
-use uuid::Uuid;
 use tantra_core::*;
+use uuid::Uuid;
 
 fn instrument() -> InstrumentId {
     InstrumentId::new(Exchange::Nse, "RELIANCE")

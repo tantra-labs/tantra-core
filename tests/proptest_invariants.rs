@@ -4,8 +4,8 @@ use chrono::Utc;
 use proptest::prelude::*;
 use rust_decimal::Decimal;
 use std::str::FromStr;
-use uuid::Uuid;
 use tantra_core::*;
+use uuid::Uuid;
 
 proptest! {
     // 1. Dimensional invariant: Price * Quantity = Money
