@@ -4,9 +4,10 @@ Documents `tantra-core/src/quant.rs`: the single canonical home for pure,
 zero-I/O numeric transforms over exact `Decimal` values. Downstream crates
 (`tantra-market-indicators`, `tantra-agent-analytics`,
 `tantra-runtime-backtest`, and the future `tantra-ledger-allocation`) should
-delegate to these rather than re-deriving locally — tracked by
-[gap 0001](../gaps/0001-call-site-consolidation.md) /
-[plan 0002](../plans/0002-call-site-consolidation.md).
+delegate to these rather than re-deriving locally. The Phase A audit (below)
+found **no applicable delegation sites** in the current downstream crates, so
+gap 0001 and plan 0002 were **closed 2026-11-14 on that decision**; delegation
+remains a revisit-on-new-consumer item rather than a rewrite.
 
 ## `QuantSeries`
 
@@ -70,6 +71,11 @@ Audit of the two crates named by gap 0001 for local re-derivations of the transf
 **Finding: there are no 1:1 delegation sites** — neither crate re-derives a transform with
 compatible semantics and type policy, so no in-place replacement was made. Delegation remains
 a "revisit when a new Decimal-bounded quant consumer appears" item, not a mechanical rewrite.
+
+**Decision (2026-11-14)**: gap 0001 + plan 0002 closed on this audit — the downstream crates
+are f64-internal by documented policy, and forcing delegation would change public behavior.
+Delegation stays open only as a future wiring point when a Decimal-bounded quant consumer
+(e.g. `tantra-ledger-performance` parity vectors) appears.
 
 | Downstream site | Local math | quant equivalent | Delegation verdict |
 |---|---|---|---|

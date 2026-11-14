@@ -24,13 +24,14 @@ this change.
 - Zero-I/O purity + zero inline tests in `src/` verified.
 - Wire contracts: `SCHEMA_VERSION = 8`, `API_VERSION = "v1"`; generated schema
   files are never hand-edited (`make codegen`).
-- Gap 0001 open: `tantra-market-indicators` / `tantra-agent-analytics` still
-  re-derive return/vol/Sharpe/drawdown locally instead of delegating to
-  `tantra_core::quant`.
+- Gap 0001 + plan 0002 closed 2026-11-14: the Phase A audit found **no 1:1 delegation
+  sites** (`tantra-market-indicators` streaming f64, `tantra-agent-analytics` statistical
+  f64 vs `tantra_core::quant` batch Decimal); verdict + matrix in `code-quant.md`. Delegation
+  remains a revisit-on-future-consumer item, not a rewrite.
 
 ## Immediate Next Step
-- Execute plan `0002` (gap 0001): audit downstream local math, delegate to
-  `tantra_core::quant`, add parity tests on shared golden vectors.
+- EE+ kernel domain types (`docs/plans/0003` / gap 0002, task T12.1) — next open work in this
+  repo.
 
 ## Operating Invariants
 - Canonical profile `prod`: `cargo build/check/test --profile prod`.
