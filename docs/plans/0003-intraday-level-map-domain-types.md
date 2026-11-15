@@ -1,4 +1,4 @@
-# 0003 — Intraday Level-Map, Options-Positioning & Stop-Protection Domain Types
+# 0003 — Intraday Level-Map, Options-Positioning & Signal Domain Types
 
 **Status**: Proposed
 **Target Scope**: `tantra-core`
@@ -9,14 +9,23 @@
 
 Add the canonical kernel types the Elephant Edge (EE+) platform serializes
 everywhere: the session level map (Elephant zones, OI walls, gamma flip,
-Order Blocks, previous-day levels), option-chain/gamma snapshots, stop
-protection (SL/TSL), strategy signals, and positioning intents. Zero-I/O,
-immutable, Decimal-only, `JsonSchema`-derived wire contracts, WASM-clean.
+Order Blocks, previous-day levels), option-chain/gamma snapshots, and EE+ strategy
+signals / level-ref positioning contexts. Zero-I/O, immutable, `Decimal`-only,
+`JsonSchema`-derived wire contracts, WASM-clean.
+
+> **Contract Reconciliation ([plan 0005](0005-trade-planner-and-manager.md))**:
+> Stop-protection, trailing-stop rules, profit-booking ladders, and trade-plan
+> sizing live in **one canonical place** (`src/trade_plan.rs` in plan `0005` via
+> `StopRule`, `TrailRule`, `TargetLadder`, `TradePlan`). Do **not** create a
+> parallel `src/stop_protection.rs` (`StopProtection` / `TrailMode` / `StopUpdate`)
+> hierarchy; EE+ `ee_plus` preset and downstream `tantra-risk` gap `0005` /
+> `tantra-exec` gap `0003` / `tantra-ledger` gap `0012` consume `TradePlan` +
+> `TradeAction::MoveStop` directly (optional thin type aliases only if needed for compat).
 
 ## 1. Verified Current State
 
-- `tantra-core` ships value objects, `Decision`, and `quant`; **no level-map /
-  options-positioning / stop-protection / signal types exist** (gap 0002).
+- `tantra-core` ships value objects, `Decision`, `Signal` (`src/signal.rs`), and `quant`; **no level-map /
+  options-positioning / order-block types exist** (gap 0002).
 - `tantra-market` gaps 0001/0002 closed 2026-11-13: chain reading and OI
   stores exist **outside** the kernel; their DTOs are chat-tool-shaped
   (`OptionContract`, `OiBuildupSnapshot`), not kernel value objects — this
@@ -34,13 +43,12 @@ golden vectors + `proptest` invariants (band `low <= high`, `score <= 4`).
 `GammaExposure` (`per_strike`, `net`, `flip`); invariants: no negative OI/IV,
 flip within the struck band.
 
-### Phase 3 — Order Blocks & stop protection (`src/order_blocks.rs`, `src/stop_protection.rs`)
-`OrderBlock`, `TrailMode`, `StopProtection`, `StopUpdate`; invariants: stop
-never inside the level band, `activation_after_r > 0`.
+### Phase 3 — Order Blocks (`src/order_blocks.rs`)
+`OrderBlock` domain types feeding `LevelMap` and `PlannerInputs.level_map`
+(stop/trail mechanics delegated to [plan 0005](0005-trade-planner-and-manager.md)).
 
-### Phase 4 — Signals & positioning (`src/signals.rs`)
-`SignalKind`, `StrategySignal`, `PositionIntent`; `ref_levels` non-empty,
-quantity > 0, `confidence` in 0–100.
+### Phase 4 — EE+ Signals & Level Context (`src/signals.rs` or extension to `src/signal.rs`)
+`SignalKind`, `StrategySignal` (carries `ref_levels` + trigger metadata, convertible into `tantra_core::Signal` and accepted by `TradePlanner`'s `PlanSubject`), `PositionIntent` (adapters over `TradePlanSpec` / `TradePlan`); invariants: `ref_levels` non-empty, quantity > 0, `confidence` in `0..=100`.
 
 ### Phase 5 — Wire contracts
 `make codegen` regenerates schemas; OpenAPI/MCP JSON for the level map is
@@ -59,5 +67,6 @@ and `tantra-ui` plan 0006.
 ## 4. Related
 
 - Strategy spec: [`tantra-strategies/docs/plans/0001-elephant-edge-strategy.md`](../../../tantra-strategies/docs/plans/0001-elephant-edge-strategy.md)
-- SDK mirror: `tantra-strategies` gap 0006 (`sdk/levels.py` mirrors these 1:1)
-- UI consumption: `tantra-ui` plan 0006
+- Trade Planner / Manager: [`tantra-core/docs/plans/0005-trade-planner-and-manager.md`](0005-trade-planner-and-manager.md)
+- SDK mirror: `tantra-strategies` plan `0003` / gap `0006` (`sdk/levels.py` mirrors level-map types; stop/trail delegates to `tantra.trade_plan`)
+- UI consumption: `tantra-ui` plan 0006 / gap `0007`
