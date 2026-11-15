@@ -17,6 +17,7 @@ references + implementation record); the only remaining roadmap item
 | # | Title | Target Scope | Status |
 |---|-------|--------------|--------|
 | [0003](0003-intraday-level-map-domain-types.md) | Intraday Level-Map, Options-Positioning & Stop-Protection Domain Types (Elephant Edge EE+) | `tantra-core` | Proposed — tracks gap 0002; master plan root `docs/plans/0005` |
+| [0004](0004-classification-and-alert-wire-types.md) | Classification & Alert Wire Types (Sector/Industry, MarketCapBucket, IndexId, ScreenCategory, crossing ops, AlertRule) | `tantra-core` | Proposed — research `docs/research/trendlyne-screener-alerts-mcp.md`; root plan `docs/plans/0007` (F1, F7 wire) |
 
 ## Implemented Plans
 
