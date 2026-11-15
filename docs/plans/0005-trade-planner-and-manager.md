@@ -43,6 +43,22 @@ wasm32-compatible. New module `src/trade_plan.rs` (+ `trade_manager.rs`).
 - `TradeManager`: `on_bar(&mut self, bar{o,h,l,c,ts}, snapshot) -> Vec<TradeAction{MoveStop{new}, PartialExit{qty, reason}, ExitAll{reason}, None}>`.
   Intrabar policy configurable, default conservative (stop before target when both inside high/low). Stop never loosens.
 
+### 2a. Pattern-driven plans (`ChartPattern`; detection in `tantra-market` plan 0002)
+
+- New wire type `src/chart_pattern.rs`: `ChartPattern { kind: PatternKind, direction, pivots: Vec<PatternPivot{bar_ts, price: Price, kind}>,
+  breakout_level: Price, invalidation_level: Price, measured_target: Option<Price>, quality: u8 /*0..=100*/, formed_from, confirmed_at }`.
+  `PatternKind` covers flag, pennant, triangle (asc/desc/sym), rectangle, Darvas box, double top/bottom, head and shoulders (and inverse),
+  wedge, cup-and-handle, VCP, and the multi-bar candlestick kinds. All prices are `Decimal`. Constructors validate the geometry:
+  invalidation must sit on the losing side of the breakout, and the target on the winning side.
+- `PlannerInputs.pattern: Option<ChartPattern>`.
+- `EntryRule::PatternBreakout{buffer_ticks}`: entry is the breakout level plus a buffer.
+- `StopRule::PatternInvalidation{buffer_atr}`.
+- `TargetLeg.trigger` gains `MeasuredMove{fraction_of_height}`. The default is `1.0`, so the leg sits at the full measured target.
+- The guard `min_reward_risk` applies to the measured-move target. When the target's R is below the minimum, the result is
+  `PlanError::InsufficientReward`.
+- New preset `pattern_breakout`: pattern entry, pattern-invalidation SL, ½ at the measured move, runner on a Chandelier trail.
+- Pattern quality and edge stats from `tantra-market` plan 0002 Phase D may scale `risk_pct` only after Phase D publishes them.
+
 Phases: **P1** DTOs + `TradePlanner` (+ errors, sizing reuse); **P2** `TradeManager` state machine; **P3** presets as data
 (`qullamaggie`, `ee_plus`, `atr_swing`) + golden vectors + `schemars` schema export.
 
