@@ -4,8 +4,8 @@
 
 ## 0. Executive Summary & Objective
 
-Today [`Signal`](../src/signal.rs) carries optional `entry_price`, `stop_loss`, `take_profit`,
-and `volatility_atr` but nothing computes them, and [`Decision::PlaceOrder`](../src/decision.rs) has no stop/target.
+Today [`Signal`](../../src/signal.rs) carries optional `entry_price`, `stop_loss`, `take_profit`,
+and `volatility_atr` but nothing computes them, and [`Decision::PlaceOrder`](../../src/decision.rs) has no stop/target.
 This plan adds a pure, deterministic **TradePlanner** (signal/pattern → sized plan) and **TradeManager**
 (bar-by-bar state machine: fill re-anchoring, move stop, partial exit, exit) driven by **canonical, versioned presets**
 (`qullamaggie`, `ee_plus`, `atr_swing`, `pattern_breakout`). One Rust implementation drives backtest, Python FFI, and live runtime.
@@ -14,10 +14,10 @@ Master roadmap: [root plan 0008](../../../docs/plans/0008-trade-signal-generator
 ## 1. Context & Gaps Covered
 
 - Reuses `SizingMethod`, `RiskBudget`, `PositionSizingRequest/Result`, `calculate_position_size` (`src/sizing.rs`). Extends `RiskBudget` / `PositionSizingRequest` with optional `max_weight_pct`, `max_adv_pct`, and `adv20: Option<Quantity>` so L1 `tantra-risk` (`validate_sizing_request`) enforces weight and liquidity caps consistently.
-- `OrderType` (`src/order.rs`) has no bracket/trailing; `TradePlan` drives `OrderRequest` intents and synthetic OCO in `tantra-runtime` until `tantra-exec/docs/gaps/0003` and `tantra-ledger/docs/gaps/0012` land. Keep [`Decision`](../src/decision.rs) slim (`PlaceOrder` / `ModifyOrder` / `CancelOrder`); do not bloat `Decision` before bracket execution lands.
+- `OrderType` (`src/order.rs`) has no bracket/trailing; `TradePlan` drives `OrderRequest` intents and synthetic OCO in `tantra-runtime` until `tantra-exec/docs/gaps/0003` and `tantra-ledger/docs/gaps/0012` land. Keep [`Decision`](../../src/decision.rs) slim (`PlaceOrder` / `ModifyOrder` / `CancelOrder`); do not bloat `Decision` before bracket execution lands.
 - **Unification with [plan 0003](0003-intraday-level-map-domain-types.md)**: Plan `0003` owns `LevelMap` / `Level` / `OptionChainSnapshot` / `OrderBlock` (EE+ level inputs). Stop/trail rules (`StopRule`, `TrailRule`, `TargetLadder`, `TradePlan`) and signal unification (`PlanSubject` accepting `tantra_core::Signal`, `StrategySignal` + `LevelMap`, or `ChartPattern`) live here in `0005` so `tantra-core` has **one** stop/trail hierarchy (`StopProtection` in `0003` is collapsed/aliased to `TradePlan` stop/trail specs).
 - `tantra-risk/docs/gaps/0005` (SL/TSL validation) consumes `TradePlan` / `TradePlanSpec` rather than a separate `StopProtection` struct.
-- Root plans 0005 (EE+), 0006 (Qullamaggie), and 0008 §3 (Pattern-driven) define the preset rules.
+- Root plans 0005 (EE+), 0009 (Qullamaggie), and 0008 §3 (Pattern-driven) define the preset rules.
 
 ## 2. Component Specifications & Phases
 
@@ -75,7 +75,7 @@ Tests only in `tests/trade_plan_tests.rs`, `tests/trade_manager_tests.rs`, `test
 ## 4. Dependencies & Tier Notes
 
 L0 only: `rust_decimal`, `chrono`, `serde`, `schemars`, `thiserror`.
-Consumers: `tantra-risk` (gap 0005), `tantra-exec` (gap 0003), `tantra-ledger` (gap 0012), `tantra-market` (plan 0002), `tantra-runtime` (plan 0006), `tantra-ffi` (plan 0002), `tantra-agent` (plan 0014).
+Consumers: `tantra-risk` (gap 0005), `tantra-exec` (gap 0003), `tantra-ledger` (gap 0012), `tantra-market` (plan 0002), `tantra-runtime` (plan 0006), `tantra-ffi` (plan 0004), `tantra-agent` (plan 0014).
 Indicator gap: `tantra-market/docs/gaps/0007` (ADR%, Chandelier).
 
 ## 5. Decisions Locked (Previously Open)
