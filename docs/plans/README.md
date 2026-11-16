@@ -17,7 +17,7 @@ references + implementation record); the only remaining roadmap item
 | # | Title | Target Scope | Status |
 |---|-------|--------------|--------|
 | [0003](0003-intraday-level-map-domain-types.md) | Intraday Level-Map, Options-Positioning & Stop-Protection Domain Types (Elephant Edge EE+) | `tantra-core` | Proposed — tracks gap 0002; master plan root `docs/plans/0005` |
-| [0004](0004-classification-and-alert-wire-types.md) | Classification & Alert Wire Types (Sector/Industry, MarketCapBucket, IndexId, ScreenCategory, crossing ops, AlertRule) | `tantra-core` | Proposed — research `docs/research/trendlyne-screener-alerts-mcp.md`; root plan `docs/plans/0010` (F1, F7 wire) |
+| [0004](0004-classification-and-alert-wire-types.md) | Classification Value Objects & Converged Screener Wire Types (`Sector`/`Industry`/`IndexId`/`MarketCapBucket`, recursive Screener DSL) | `tantra-core` | Proposed (revised 2026-11-16; `ScreenCategory` & `AlertRule` moved out of L0) — research `docs/research/trendlyne-screener-alerts-mcp.md`; root plan `docs/plans/0010` (F1) |
 | [0005](0005-trade-planner-and-manager.md) | Trade Planner & Trade Manager (entry/SL/TSL/scale-out/sizing, named presets) | `tantra-core` | Proposed — root plan `docs/plans/0008` |
 
 ## Implemented Plans
