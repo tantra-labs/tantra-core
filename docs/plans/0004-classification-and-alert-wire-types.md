@@ -11,7 +11,7 @@ existing screener predicate, and `AlertRule` / `AlertEvent`. tantra-core stays p
 clock, `Decimal` only, wasm-compatible, schemars schemas.
 
 References: research [`trendlyne-screener-alerts-mcp.md`](../../../docs/research/trendlyne-screener-alerts-mcp.md)
-(F1 + F7 wire); root roadmap [`0007`](../../../docs/plans/0007-screener-taxonomy-and-alerts.md).
+(F1 + F7 wire); root roadmap [`0010`](../../../docs/plans/0010-screener-taxonomy-and-alerts.md).
 Trendlyne is an idea source only; nothing here depends on it.
 
 ## 1. Context & Gaps Covered
