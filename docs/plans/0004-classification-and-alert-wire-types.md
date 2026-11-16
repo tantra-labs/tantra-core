@@ -75,7 +75,7 @@ L0; depends only on `rust_decimal`, `chrono`, `serde`, `schemars`, `thiserror`. 
 [tantra-data 0007](../../../tantra-data/docs/plans/0007-instrument-master-index-membership.md),
 [tantra-data 0008](../../../tantra-data/docs/plans/0008-screen-dsl-catalog-qvm.md),
 [tantra-strategies 0002](../../../tantra-strategies/docs/plans/0002-universe-screen-context.md),
-[tantra-runtime 0005](../../../tantra-runtime/docs/plans/0005-group-screener-alerts.md),
+[tantra-runtime 0007](../../../tantra-runtime/docs/plans/0007-group-screener-alerts.md),
 [tantra-agent 0013](../../../tantra-agent/docs/plans/0013-screener-mcp-tools.md). No floats.
 
 ## 5. Open Questions
