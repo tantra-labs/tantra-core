@@ -24,6 +24,15 @@ fn test_all_canonical_types_implement_valid_json_schema() {
     let _s_country = schema_for!(CountryCode);
     let _s_session = schema_for!(SessionWindow);
     let _s_instrument = schema_for!(Instrument);
+    let _s_sector = schema_for!(Sector);
+    let _s_industry = schema_for!(Industry);
+    let _s_index = schema_for!(IndexId);
+    let _s_cap = schema_for!(MarketCapBucket);
+    let _s_scr_req = schema_for!(ScreenerScanRequest);
+    let _s_scr_resp = schema_for!(ScreenerScanResponse);
+    let _s_scr_group = schema_for!(ScreenerFilterGroup);
+    let _s_scr_pred = schema_for!(ScreenerFilterPredicate);
+    let _s_metric_def = schema_for!(MetricDefinition);
 }
 
 #[test]

@@ -9,11 +9,13 @@
 //! Provides:
 //! - Canonical strongly-typed aggregate IDs ([`ClientOrderId`], [`AlgoId`], [`AccountId`], [`TransactionId`])
 //! - Canonical [`Exchange`] and [`InstrumentId`], covering NSE, BSE, NFO, MCX, and CDS
+//! - Market-agnostic classification value objects ([`Sector`], [`Industry`], [`IndexId`], [`MarketCapBucket`])
 //! - Exact decimal financial math ([`Price`], [`Quantity`], [`Money`])
 //! - Canonical market data [`Tick`], [`DepthLevel`], [`Bar`]
 //! - Canonical [`OrderRequest`], [`OrderAck`], [`FillReport`]
 //! - Safe, closed, strictly-validated AI [`Decision`]
 //! - Scrip-wise [`PriceBand`] limits for Indian market microstructure
+//! - Converged recursive Screener DSL ([`ScreenerFilterGroup`], [`ScreenerFilterPredicate`], [`PredicateValue`], [`ClassificationFilter`])
 //! - Canonical dynamic position sizing grammar ([`SizingMethod`], [`RiskBudget`], [`PositionSizingRequest`], [`PositionSizingResult`])
 //! - Statistical overfitting & tail-risk validation gates (`analytics::ValidationBlock` — DSR, PBO, walk-forward, holdout, block-bootstrap Monte Carlo, cost stress)
 //! - Tactical DDD first-class aggregate events ([`DomainEvent`])
@@ -22,6 +24,7 @@
 
 pub mod analytics;
 pub mod calendar;
+pub mod classification;
 pub mod decision;
 pub mod error;
 pub mod events;
@@ -49,6 +52,7 @@ pub use analytics::{
     walk_forward::{WalkForwardConfig, WalkForwardResult, compute_walk_forward},
 };
 pub use calendar::{SessionWindow, TradingCalendar};
+pub use classification::{IndexId, Industry, MarketCapBucket, Sector};
 pub use decision::Decision;
 pub use error::CoreError;
 pub use events::{DomainEvent, ExecutionEvent, Reason, ReasonGroup, ReasonPolarity, TradingState};
@@ -77,7 +81,8 @@ pub use quant::{
     simple_returns, tracking_error,
 };
 pub use screener::{
-    FilterOp, MetricDefinition, MetricKeySpec, MetricPeriod, MetricRef, ScreenerFilterGroup,
+    ClassificationFilter, FilterOp, LogicalOp, MetricDefinition, MetricKeySpec, MetricPeriod,
+    MetricRef, PredicateValue, RelativeStat, RelativeTo, ScreenerFilterGroup, ScreenerFilterItem,
     ScreenerFilterPredicate, ScreenerRow, ScreenerScanRequest, ScreenerScanResponse, SortSpec,
 };
 pub use signal::{
@@ -113,9 +118,11 @@ pub use wire::TraceContext;
 ///
 /// Migration note (Tier 0, `honba-core` → `tantra-core`, still wire-compatible
 /// with v8): added the canonical aggregate IDs module (`ids`), `Exchange::{Nfo,
-/// Cds}` variants, and hardened `Price`/`Quantity` deserialization to reject
-/// negative values at the serde boundary. All v8 payloads deserialize
-/// unchanged; the additions are strictly additive.
+/// Cds}` variants, hardened `Price`/`Quantity` deserialization to reject
+/// negative values at the serde boundary, and (Plan 0004) added slim
+/// classification VOs (`Sector`, `Industry`, `IndexId`, `MarketCapBucket`)
+/// plus the converged recursive Screener DSL with deserialization shims so
+/// all v8 flat screener payloads continue to deserialize unchanged.
 pub const SCHEMA_VERSION: u32 = 8;
 
 /// Semantic version of the REST endpoint surface.

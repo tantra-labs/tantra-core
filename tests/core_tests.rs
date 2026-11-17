@@ -392,21 +392,14 @@ fn test_signal_enrichment_and_builder() {
 
 #[test]
 fn test_screener_scan_request_roundtrip() {
-    let predicate = ScreenerFilterPredicate {
-        metric: MetricRef(MetricKeySpec {
-            metric: "rsi_14".to_string(),
-            period: MetricPeriod::D1,
-        }),
-        op: FilterOp::Gt,
-        value: Decimal::from(70),
-        value_upper: None,
-    };
+    let predicate = ScreenerFilterPredicate::new(
+        MetricRef(MetricKeySpec::new("rsi_14").with_period(MetricPeriod::D1)),
+        FilterOp::Gt,
+        PredicateValue::Decimal(Decimal::from(70)),
+    );
     let request = ScreenerScanRequest {
         universe: Some(vec![instrument()]),
-        filters: ScreenerFilterGroup {
-            predicates: vec![predicate],
-            match_all: true,
-        },
+        filters: ScreenerFilterGroup::and(vec![ScreenerFilterItem::Predicate(predicate)]),
         sort: None,
         limit: Some(50),
     };

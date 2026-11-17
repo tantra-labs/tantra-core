@@ -1,10 +1,22 @@
-# `tantra-core` — Wire Contracts Reference (Instrument, Market, Order, Portfolio, Screener, Signal, Calendar)
+# `tantra-core` — Wire Contracts Reference (Classification, Instrument, Market, Order, Portfolio, Screener, Signal, Calendar)
 
 Documents the canonical wire-contract modules not covered by dedicated docs:
-`instrument.rs`, `market.rs`, `order.rs`, `portfolio.rs`, `screener.rs`,
-`signal.rs`, and `calendar.rs`. Every type derives `JsonSchema` and
-`Serialize`/`Deserialize` — these are the single source of truth for the JSON
+`classification.rs`, `instrument.rs`, `market.rs`, `order.rs`, `portfolio.rs`,
+`screener.rs`, `signal.rs`, and `calendar.rs`. Every type derives `JsonSchema`
+and `Serialize`/`Deserialize` — these are the single source of truth for the JSON
 wire format.
+
+## Market-Agnostic Classification (`classification.rs`)
+
+Slim, jurisdiction-neutral classification value objects shared across `tantra-core`
+consumers (jurisdiction-specific cutoff rules such as SEBI/AMFI ranks, NSE
+4-level hierarchy validation, and editorial themes live downstream in
+`tantra-data` / `tantra-market-finance`):
+
+- `Sector` — validated, whitespace-normalized non-empty label (`MAX_CLASSIFICATION_LEN = 80`, no control chars).
+- `Industry` — validated, whitespace-normalized non-empty label (`MAX_CLASSIFICATION_LEN = 80`, no control chars).
+- `IndexId` — validated uppercase ASCII index identifier (`MAX_INDEX_ID_LEN = 40`, ASCII alphanumeric plus `'_'` / `'-'`, e.g. `"NIFTY50"`, `"NIFTY500"`, `"SENSEX"`, `"SP500"`).
+- `MarketCapBucket` — bare tier enum (`Large`, `Mid`, `Small`, `Micro`, `snake_case`, with `ALL` and `as_str()`).
 
 ## Instrument Reference Data (`instrument.rs`)
 
@@ -108,18 +120,22 @@ Wire contracts crossing the Heart (`tantra-ledger`) → House (`tantra-runtime`)
 | `PortfolioAccount` | Account-level aggregate |
 | `PortfolioSnapshot` | The full snapshot envelope |
 
-## Screener (`screener.rs`)
+## Converged Screener DSL (`screener.rs`)
 
-- `MetricPeriod` — type alias reusing `signal::Timeframe` (a metric's period and
-  a bar's interval are the same concept).
-- `FilterOp` — `Eq`, `Ne`, `Gt`, `Gte`, `Lt`, `Lte`, `Between`.
-- `MetricKeySpec { metric, period }`, `MetricRef(MetricKeySpec)`, `MetricDefinition`.
-- `ScreenerFilterPredicate`, `ScreenerFilterGroup`, `SortSpec`.
-- `ScreenerScanRequest`, `ScreenerScanResponse`, `ScreenerRow`.
+- `MetricPeriod` — `Snapshot`, `Ttm`, `Fy`, `Fq`, `H1`, `Current`, `Intraday`, `Daily` (`D1` constant alias), `Weekly` (`W1` constant alias), `Monthly` (accepts uppercase & `d1`/`w1` wire aliases).
+- `LogicalOp` — `And` (`"AND"`), `Or` (`"OR"`).
+- `FilterOp` — `Eq`, `Ne` (accepts legacy `"neq"` alias), `Gt`, `Gte`, `Lt`, `Lte`, `Between`, `In`, `NotIn`, `Like`, `Has`, `CrossesAbove`, `CrossesBelow`.
+- `MetricKeySpec { key, period: Option<MetricPeriod>, timeframe: Option<Timeframe> }` (accepts legacy `"metric"` alias for `key`), `MetricRef(MetricKeySpec)`, `MetricDefinition { key, description, unit }`.
+- `PredicateValue` — `Decimal(Decimal)`, `Bool(bool)`, `MetricRef(MetricRef)`, `List(Vec<PredicateValue>)`, `String(String)`. Deserialization strictly rejects IEEE-754 floats (`f32`/`f64`) and non-finite literals (`NaN`, `Infinity`).
+- `RelativeTo` (`Sector`, `Industry`, `Index(IndexId)`) and `RelativeStat` (`Median`, `Mean`, `ReturnDelta`).
+- `ClassificationFilter { sector?, industry?, cap_bucket?, index?, theme? }`.
+- `ScreenerFilterPredicate { metric, op, value, relative_to?, relative_stat? }` (supports `.between()`, `.between_bounds()`, `.with_relative()`, `.validate()`, plus legacy flat `key`/`value_upper` deserialization).
+- `ScreenerFilterItem::Predicate | Group(Box<ScreenerFilterGroup>)` and recursive `ScreenerFilterGroup { operator, items, classification? }` (with `.predicates()`, `.metric_keys()`, `.validate()`, and v8 flat `{"predicates", "match_all"}` backward-compat deserialization).
+- `SortSpec { metric, descending }`, `ScreenerScanRequest { universe, filters, sort, limit }`, `ScreenerScanResponse { rows, total_matched }`, `ScreenerRow { instrument, metrics }`.
 
 ## Signals (`signal.rs`)
 
-- `Timeframe` — `M1`, `M5`, `M15`, `M30`, `H1`, `D1`, `W1`.
+- `Timeframe` — `M1`, `M5`, `M15`, `M30`, `H1`, `H2`, `H4`, `D1`, `W1`, `Month1` (`parse_wire()`, `as_str()`, `as_wire_str()`).
 - `SignalDirection` — `Bullish`, `Bearish`, `Neutral`.
 - `SignalHorizon` — `Intraday`, `Swing`, `Positional`.
 - `Signal` — `instrument`, `direction`, `horizon`, `timeframe`, `strength` (in

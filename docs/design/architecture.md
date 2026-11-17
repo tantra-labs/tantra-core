@@ -12,7 +12,9 @@ The kernel owns the ubiquitous language:
 
 - Strongly-typed aggregate IDs — `ClientOrderId`, `AlgoId`, `AccountId`, `TransactionId`.
 - Exact-decimal financial value objects — `Price`, `Quantity`, `Money`, `Currency`, `MinorUnit`.
+- Market-agnostic classification value objects — `Sector`, `Industry`, `IndexId`, `MarketCapBucket`.
 - Canonical instrument, market, and order contracts — `InstrumentId`, `Tick`, `Bar`, `OrderRequest`, `OrderAck`, `FillReport`.
+- The converged recursive `Decimal` Screener DSL (`ScreenerFilterGroup`, `ScreenerFilterPredicate`, `ClassificationFilter`, `RelativeTo`, `RelativeStat`).
 - The closed AI `Decision` grammar and authoritative `DomainEvent`s.
 - Hexagonal port traits, the trading calendar, dynamic position sizing grammar, and the statistical validation gates.
 - Single source of truth for wire contracts: every wire type derives `JsonSchema`; OpenAPI/JSON/MCP schemas are generated from them (`make codegen`).
@@ -35,6 +37,7 @@ tantra-core/src/
 ├── error.rs          # CoreError taxonomy
 ├── ids.rs            # ClientOrderId, AlgoId, AccountId, TransactionId
 ├── types.rs          # Exchange, InstrumentId, Price, Quantity, Money, PriceBand, Currency, CountryCode, MinorUnit
+├── classification.rs # Sector, Industry, IndexId, MarketCapBucket (slim market-agnostic VOs)
 ├── instrument.rs     # Instrument / InstrumentProfile, InstrumentKind, OptionType, PositionSide, TradeId, VenueOrderId, DatasetId
 ├── market.rs         # Tick (Ltp | Quote | Depth), DepthLevel, Bar
 ├── order.rs          # OrderSide, OrderType, TimeInForce, OrderStatus, OrderRequest, ModifyRequest, CancelRequest, OrderAck, FillReport, FeeBreakdown, RejectReason, OrderEvent, OrderEventKind
@@ -43,8 +46,8 @@ tantra-core/src/
 ├── wire.rs           # TraceContext (W3C traceparent)
 ├── calendar.rs       # SessionWindow + TradingCalendar port
 ├── portfolio.rs      # PortfolioSnapshot, PortfolioPosition, PortfolioHolding, PortfolioGreeks, PortfolioTotals, PortfolioAccount
-├── screener.rs       # ScreenerScanRequest/Response, FilterOp, MetricKeySpec, ScreenerRow, SortSpec
-├── signal.rs         # Signal, SignalDirection, SignalHorizon, Timeframe, SignalScanRequest/Response
+├── screener.rs       # Recursive ScreenerScanRequest/Response, ScreenerFilterGroup/Item/Predicate, FilterOp, MetricPeriod, MetricKeySpec, PredicateValue, ClassificationFilter, RelativeTo, RelativeStat, ScreenerRow, SortSpec
+├── signal.rs         # Signal, SignalDirection, SignalHorizon, Timeframe (M1..Month1), SignalScanRequest/Response
 ├── ports.rs          # Hexagonal port traits (BarReader, TickReader, ..., PositionSizer) + PortError/PortResult
 ├── sizing.rs         # SizingMethod, RiskBudget, PositionSizingRequest/Result, calculate_position_size
 ├── quant.rs          # QuantSeries + canonical quant transforms (plan 0001)
@@ -57,7 +60,7 @@ Reference docs:
 |--------|-----|
 | `types.rs` | [code-types](code-types.md) |
 | `ids.rs`, `error.rs` | [code-ids](code-ids.md) |
-| `instrument.rs`, `market.rs`, `order.rs`, `portfolio.rs`, `screener.rs`, `signal.rs`, `calendar.rs` | [code-wire-contracts](code-wire-contracts.md) |
+| `classification.rs`, `instrument.rs`, `market.rs`, `order.rs`, `portfolio.rs`, `screener.rs`, `signal.rs`, `calendar.rs` | [code-wire-contracts](code-wire-contracts.md) |
 | `decision.rs` | [code-decision](code-decision.md) |
 | `events.rs`, `wire.rs` | [code-events](code-events.md) |
 | `ports.rs` | [code-ports](code-ports.md) |
@@ -82,6 +85,7 @@ Reference docs:
 | Area | Module(s) | Tests |
 |------|-----------|-------|
 | Value objects + identifiers | `types.rs`, `ids.rs`, `error.rs` | `tests/core_tests.rs`, `tests/proptest_invariants.rs` |
+| Classification value objects (plan 0004) | `classification.rs` | `tests/classification_tests.rs` (6), `tests/classification_proptest.rs` (4) |
 | Market / order / instrument wire contracts | `market.rs`, `order.rs`, `instrument.rs` | `tests/core_tests.rs`, `tests/golden_test.rs` |
 | Closed `Decision` grammar | `decision.rs` | `tests/core_tests.rs`, `tests/golden_test.rs` |
 | Domain events + trace context | `events.rs`, `wire.rs` | `tests/core_tests.rs` |
@@ -89,7 +93,7 @@ Reference docs:
 | Sizing grammar | `sizing.rs` | `tests/core_tests.rs` |
 | Quant transforms (plan 0001) | `quant.rs` | `tests/quant_tests.rs` (33), `tests/quant_proptest.rs` |
 | Statistical validation gates | `analytics/` | `tests/analytics_gates_tests.rs` |
-| Screener / signal / portfolio wire types | `screener.rs`, `signal.rs`, `portfolio.rs` | `tests/core_tests.rs` |
+| Converged Screener DSL + signals + portfolio (plan 0004) | `screener.rs`, `signal.rs`, `portfolio.rs` | `tests/core_tests.rs`, `tests/screener_extension_tests.rs` (7) |
 | Schema compatibility & golden vectors | `schema/` | `tests/schema_compatibility_test.rs`, `tests/golden_test.rs` |
 
 ### Verification Gate
@@ -104,10 +108,8 @@ make fmt       # cargo fmt
 
 ### What Remains
 
-- **Call-site consolidation** — downstream crates (`tantra-market-indicators`,
-  `tantra-agent-analytics`) still re-derive returns/vol/Sharpe/drawdown locally
-  instead of delegating to `tantra_core::quant`; tracked by
-  [gap 0001](../gaps/0001-call-site-consolidation.md) /
-  [plan 0002](../plans/0002-call-site-consolidation.md).
-
-See the [gaps](../gaps/README.md) and [plans](../plans/README.md) indexes.
+- Call-site consolidation (`gap 0001` / `plan 0002`) was closed on audit (see
+  [code-quant](code-quant.md) and the [plans index](../plans/README.md#implemented-plans)).
+- Remaining active work items are tracked in the [gaps](../gaps/README.md) and
+  [plans](../plans/README.md) indexes (`0003` intraday level-map / EE+ domain
+  types and `0005` trade planner & manager).
