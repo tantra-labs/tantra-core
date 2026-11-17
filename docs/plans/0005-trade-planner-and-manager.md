@@ -24,6 +24,16 @@ Master roadmap: [root plan 0008](../../../docs/plans/0008-trade-signal-generator
 All types: `Decimal`-only, `schemars::JsonSchema`, `#[serde(deny_unknown_fields)]` on input/spec DTOs, no I/O, no wall clock (timestamps injected),
 WASM-compatible. New modules: `src/trade_plan.rs`, `src/trade_manager.rs`, `src/chart_pattern.rs`, and embedded canonical TOML presets. Bump `SCHEMA_VERSION` (`v8` → `v9`) when adding wire contracts.
 
+> **Placement decision (2026-11-17, T12 review)**: the *wire contracts and the
+> `TradePlanner` pure function* (`TradePlanSpec`/`TradePlan`/`PlannerInputs`/
+> `PlanError`/`PlannedTarget`, `chart_pattern.rs`) live in `tantra-core` as the
+> single source of truth for every consumer. The **`TradeManager` state machine
+> (P2)** is an OMS-level lifecycle aggregate and now lives in
+> `tantra-ledger-oms` (`crates/tantra-ledger-oms/src/trade_manager.rs`, beside
+> `BracketOrder`). The **canonical presets (P3)** are config data and live in
+> `tantra-runtime-config` (`crates/tantra-runtime-config/src/presets.rs`,
+> embedded TOML, golden vectors in `tests/golden/`).
+
 - `EntryRule { Market, LimitAt(Price), StopAbove{trigger}, StopBelow{trigger}, OpeningRangeBreak{minutes}, PatternBreakout{buffer_ticks} }` + symmetric chase guard (`max_extension_atr`, long/short aware).
 - `StopRule { Fixed(Price), Percent(Decimal), AtrMultiple{mult}, LevelBand{band, buffer_atr}, Swing, DayExtreme /*DayLow for long, DayHigh for short*/, Chandelier{period, mult}, PatternInvalidation{buffer_atr} }`
   with `max_stop_distance` guard (absolute or `max_stop_adr_mult × adr_pct` evaluated cleanly in `%`: `|entry - sl| / entry × 100 <= mult × adr_pct`).
@@ -61,9 +71,9 @@ WASM-compatible. New modules: `src/trade_plan.rs`, `src/trade_manager.rs`, `src/
 
 ### Phases
 
-- **P1**: Unify stop/signal contracts (`0003` + `0005`), `RiskBudget` weight/ADV fields, `ChartPattern`, `TradePlanSpec`/`TradePlan`/`PlanError`, `TradePlanner` (tick-snapping, `ZeroRisk` guard).
-- **P2**: `TradeManager` state machine (`on_entry_fill`, `on_bar`, `on_session_close`, persistent serde state).
-- **P3**: Canonical embedded TOML presets (`qullamaggie`, `ee_plus`, `atr_swing`, `pattern_breakout`), golden vectors, and `schemars` export (single source of truth consumed by FFI, strategies, runtime, and agent).
+- **P1** ✅ (2026-11-17): Unify stop/signal contracts (`0003` + `0005`), `RiskBudget` weight/ADV fields, `ChartPattern`, `TradePlanSpec`/`TradePlan`/`PlanError`, `TradePlanner` (tick-snapping, `ZeroRisk` guard). Lives in `tantra-core`.
+- **P2** ✅ (2026-11-17): `TradeManager` state machine (`on_entry_fill`, `on_bar`, `on_session_close`, persistent serde state) — landed in `tantra-ledger-oms` (placement decision above), 15 tests + proptest.
+- **P3** ✅ (2026-11-17): Canonical embedded TOML presets (`qullamaggie`, `ee_plus`, `atr_swing`, `pattern_breakout`), golden vectors, and schemars export — landed in `tantra-runtime-config` (placement decision above), 5 tests incl. golden vectors.
 
 ## 3. Test Plan (TDD)
 
