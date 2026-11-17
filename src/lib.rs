@@ -27,6 +27,7 @@
 
 pub mod analytics;
 pub mod calendar;
+pub mod chart_pattern;
 pub mod classification;
 pub mod decision;
 pub mod error;
@@ -45,6 +46,7 @@ pub mod screener;
 pub mod signal;
 pub mod signals;
 pub mod sizing;
+pub mod trade_plan;
 pub mod types;
 pub mod wire;
 
@@ -59,6 +61,9 @@ pub use analytics::{
     walk_forward::{WalkForwardConfig, WalkForwardResult, compute_walk_forward},
 };
 pub use calendar::{SessionWindow, TradingCalendar};
+pub use chart_pattern::{
+    ChartPattern, MAX_PATTERN_QUALITY, PatternKind, PatternPivot, PatternStage,
+};
 pub use classification::{IndexId, Industry, MarketCapBucket, Sector};
 pub use decision::Decision;
 pub use error::CoreError;
@@ -104,6 +109,11 @@ pub use signals::{PositionIntent, SignalKind, StrategySignal};
 pub use sizing::{
     PositionSizingRequest, PositionSizingResult, RiskBudget, SizingMethod, calculate_position_size,
 };
+pub use trade_plan::{
+    BreakevenTrigger, EntryRule, MAX_EXTENSION_ATR, MaKind, PlanError, PlanSubject, PlannedTarget,
+    PlannerInputs, SizingSpec, StopRule, TargetLadder, TargetLeg, TargetTrigger, TimeStop,
+    TradePlan, TradePlanSpec, TradePlanner, TrailRule, TrailSpec,
+};
 pub use types::{
     CountryCode, Currency, Exchange, InstrumentId, MinorUnit, Money, Price, PriceBand, Quantity,
 };
@@ -136,6 +146,15 @@ pub use wire::TraceContext;
 /// (`StrategySignal`, `SignalKind`, `PositionIntent`). Stop/trail rules are
 /// deliberately excluded (delegated to the `TradePlan` slice, plan 0005).
 ///
+/// v10: added the EE+ trade-planner wire contracts: the trade-plan/spec
+/// grammar (`EntryRule`, `StopRule`, `TrailRule`, `MaKind`,
+/// `BreakevenTrigger`, `TimeStop`, `TrailSpec`, `TargetTrigger`, `TargetLeg`,
+/// `TargetLadder`, `SizingSpec`, `TradePlanSpec`, `PlanSubject`,
+/// `PlannerInputs`, `PlannedTarget`, `TradePlan`, `PlanError`, `TradePlanner`),
+/// chart patterns (`ChartPattern`, `PatternKind`, `PatternStage`,
+/// `PatternPivot`), and the `RiskBudget` weight/ADV caps plus
+/// `PositionSizingRequest::adv20` liquidity extension.
+///
 /// Migration note (Tier 0, `honba-core` → `tantra-core`, still wire-compatible
 /// with v8): added the canonical aggregate IDs module (`ids`), `Exchange::{Nfo,
 /// Cds}` variants, hardened `Price`/`Quantity` deserialization to reject
@@ -143,7 +162,7 @@ pub use wire::TraceContext;
 /// classification VOs (`Sector`, `Industry`, `IndexId`, `MarketCapBucket`)
 /// plus the converged recursive Screener DSL with deserialization shims so
 /// all v8 flat screener payloads continue to deserialize unchanged.
-pub const SCHEMA_VERSION: u32 = 9;
+pub const SCHEMA_VERSION: u32 = 10;
 
 /// Semantic version of the REST endpoint surface.
 pub const API_VERSION: &str = "v1";

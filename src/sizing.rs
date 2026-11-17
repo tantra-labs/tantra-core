@@ -67,6 +67,20 @@ pub struct RiskBudget {
     /// Scrip freeze limit (exchange-mandated single order quantity ceiling), if configured.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub freeze_limit_qty: Option<Quantity>,
+    /// Maximum position weight (`allocated_notional / equity`) cap, if configured.
+    ///
+    /// Enforced as an additional cap inside [`calculate_position_size`]: the
+    /// lot-rounded quantity is reduced so that `qty * entry_price / equity`
+    /// never exceeds this fraction.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_weight_pct: Option<Decimal>,
+    /// Maximum fraction of 20-day average daily volume a position may consume,
+    /// if configured (e.g. `0.02` for 2% of ADV20).
+    ///
+    /// Enforced as an additional cap inside [`calculate_position_size`]:
+    /// requires the request to carry [`PositionSizingRequest::adv20`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_adv_pct: Option<Decimal>,
 }
 
 impl RiskBudget {
@@ -80,7 +94,21 @@ impl RiskBudget {
             max_portfolio_risk_pct: None,
             min_lot_size,
             freeze_limit_qty: None,
+            max_weight_pct: None,
+            max_adv_pct: None,
         }
+    }
+
+    /// Set a maximum position weight cap (`allocated_notional / equity`).
+    pub fn with_max_weight_pct(mut self, max_weight_pct: Decimal) -> Self {
+        self.max_weight_pct = Some(max_weight_pct);
+        self
+    }
+
+    /// Set a maximum position share of 20-day average daily volume.
+    pub fn with_max_adv_pct(mut self, max_adv_pct: Decimal) -> Self {
+        self.max_adv_pct = Some(max_adv_pct);
+        self
     }
 
     /// Set a maximum position notional cash cap.
@@ -129,6 +157,11 @@ pub struct PositionSizingRequest {
     pub risk_budget: RiskBudget,
     /// Dynamic position sizing model.
     pub sizing_method: SizingMethod,
+    /// 20-day average daily volume for liquidity caps, if known.
+    ///
+    /// Required to enforce [`RiskBudget::max_adv_pct`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub adv20: Option<Quantity>,
 }
 
 impl PositionSizingRequest {
@@ -150,12 +183,19 @@ impl PositionSizingRequest {
             account_equity,
             risk_budget,
             sizing_method,
+            adv20: None,
         }
     }
 
     /// Attach a stop loss price.
     pub fn with_stop_loss(mut self, stop_loss: Price) -> Self {
         self.stop_loss = Some(stop_loss);
+        self
+    }
+
+    /// Attach the 20-day average daily volume for liquidity caps.
+    pub fn with_adv20(mut self, adv20: Quantity) -> Self {
+        self.adv20 = Some(adv20);
         self
     }
 
@@ -335,6 +375,40 @@ pub fn calculate_position_size(
             rounded_qty = allowed_lots * lot_size;
             capped = true;
             reasons.push("capped by max_position_notional".to_string());
+        }
+    }
+
+    // Check max_weight_pct: qty * entry_price / equity cap. A cap at or above
+    // 1 (100%) means "no weight capping".
+    if let Some(max_weight) = request.risk_budget.max_weight_pct {
+        if max_weight > Decimal::ZERO && max_weight < Decimal::ONE {
+            let max_qty_for_weight = (equity * max_weight) / entry_p;
+            let allowed_lots = (max_qty_for_weight / lot_size).floor();
+            let capped_qty = allowed_lots * lot_size;
+            if capped_qty < rounded_qty {
+                rounded_qty = capped_qty;
+                capped = true;
+                reasons.push("capped by max_weight_pct".to_string());
+            }
+        }
+    }
+
+    // Check max_adv_pct: qty / adv20 cap. Requires the request to carry adv20.
+    if let Some(max_adv) = request.risk_budget.max_adv_pct {
+        if max_adv > Decimal::ZERO {
+            if let Some(adv20) = request.adv20 {
+                let adv20_val = adv20.value();
+                if adv20_val > Decimal::ZERO {
+                    let max_qty_for_adv = adv20_val * max_adv;
+                    let allowed_lots = (max_qty_for_adv / lot_size).floor();
+                    let capped_qty = allowed_lots * lot_size;
+                    if capped_qty < rounded_qty {
+                        rounded_qty = capped_qty;
+                        capped = true;
+                        reasons.push("capped by max_adv_pct".to_string());
+                    }
+                }
+            }
         }
     }
 

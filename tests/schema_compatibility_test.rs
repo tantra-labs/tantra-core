@@ -40,6 +40,18 @@ fn test_all_canonical_types_implement_valid_json_schema() {
     let _s_block = schema_for!(OrderBlock);
     let _s_strategy_signal = schema_for!(StrategySignal);
     let _s_intent = schema_for!(PositionIntent);
+    let _s_trade_spec = schema_for!(TradePlanSpec);
+    let _s_trade_plan = schema_for!(TradePlan);
+    let _s_planner_inputs = schema_for!(PlannerInputs);
+    let _s_plan_subject = schema_for!(PlanSubject);
+    let _s_entry_rule = schema_for!(EntryRule);
+    let _s_stop_rule = schema_for!(StopRule);
+    let _s_trail_rule = schema_for!(TrailRule);
+    let _s_trail_spec = schema_for!(TrailSpec);
+    let _s_target_ladder = schema_for!(TargetLadder);
+    let _s_pattern = schema_for!(ChartPattern);
+    let _s_pattern_kind = schema_for!(PatternKind);
+    let _s_pattern_stage = schema_for!(PatternStage);
 }
 
 #[test]
