@@ -21,6 +21,9 @@
 //! - Tactical DDD first-class aggregate events ([`DomainEvent`])
 //! - Zero-dependency W3C distributed trace context carrier ([`TraceContext`])
 //! - Abstract exchange trading calendar port ([`TradingCalendar`])
+//! - EE+ intraday level map, options positioning & gamma, order blocks, and
+//!   strategy signals/positioning ([`LevelMap`], [`OptionChainSnapshot`],
+//!   [`GammaExposure`], [`OrderBlock`], [`StrategySignal`], [`PositionIntent`])
 
 pub mod analytics;
 pub mod calendar;
@@ -30,13 +33,17 @@ pub mod error;
 pub mod events;
 pub mod ids;
 pub mod instrument;
+pub mod levels;
 pub mod market;
+pub mod options;
 pub mod order;
+pub mod order_blocks;
 pub mod portfolio;
 pub mod ports;
 pub mod quant;
 pub mod screener;
 pub mod signal;
+pub mod signals;
 pub mod sizing;
 pub mod types;
 pub mod wire;
@@ -61,11 +68,16 @@ pub use instrument::{
     DatasetId, Instrument, InstrumentKind, InstrumentProfile, OptionType, PositionSide, TradeId,
     VenueOrderId,
 };
+pub use levels::{Level, LevelId, LevelKind, LevelMap, LevelSide};
 pub use market::{Bar, DepthLevel, Tick};
+pub use options::{
+    GammaExposure, OptionChainSnapshot, StrikeGamma, StrikePositioning, gamma_flip_strike,
+};
 pub use order::{
     CancelRequest, FeeBreakdown, FillReport, ModifyRequest, OrderAck, OrderEvent, OrderEventKind,
     OrderRequest, OrderSide, OrderStatus, OrderType, RejectReason, TimeInForce,
 };
+pub use order_blocks::OrderBlock;
 pub use portfolio::{
     PortfolioAccount, PortfolioGreeks, PortfolioHolding, PortfolioMode, PortfolioPosition,
     PortfolioSnapshot, PortfolioSource, PortfolioTotals,
@@ -88,6 +100,7 @@ pub use screener::{
 pub use signal::{
     Signal, SignalDirection, SignalHorizon, SignalScanRequest, SignalScanResponse, Timeframe,
 };
+pub use signals::{PositionIntent, SignalKind, StrategySignal};
 pub use sizing::{
     PositionSizingRequest, PositionSizingResult, RiskBudget, SizingMethod, calculate_position_size,
 };
@@ -116,6 +129,13 @@ pub use wire::TraceContext;
 /// `Signal` with execution/stop levels, first-class tactical `DomainEvent`
 /// aggregate envelope, and W3C `TraceContext` distributed observability carrier.
 ///
+/// v9: added the EE+ intraday level map (`Level`, `LevelMap`, `LevelKind`,
+/// `LevelSide`, `LevelId`), options positioning & gamma (`OptionChainSnapshot`,
+/// `StrikePositioning`, `StrikeGamma`, `GammaExposure` with the gamma flip),
+/// order blocks (`OrderBlock`), and EE+ strategy signals / position intents
+/// (`StrategySignal`, `SignalKind`, `PositionIntent`). Stop/trail rules are
+/// deliberately excluded (delegated to the `TradePlan` slice, plan 0005).
+///
 /// Migration note (Tier 0, `honba-core` → `tantra-core`, still wire-compatible
 /// with v8): added the canonical aggregate IDs module (`ids`), `Exchange::{Nfo,
 /// Cds}` variants, hardened `Price`/`Quantity` deserialization to reject
@@ -123,7 +143,7 @@ pub use wire::TraceContext;
 /// classification VOs (`Sector`, `Industry`, `IndexId`, `MarketCapBucket`)
 /// plus the converged recursive Screener DSL with deserialization shims so
 /// all v8 flat screener payloads continue to deserialize unchanged.
-pub const SCHEMA_VERSION: u32 = 8;
+pub const SCHEMA_VERSION: u32 = 9;
 
 /// Semantic version of the REST endpoint surface.
 pub const API_VERSION: &str = "v1";

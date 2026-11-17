@@ -1,6 +1,8 @@
 use std::fs;
 use tantra_core::*;
 
+use rust_decimal::Decimal;
+
 #[test]
 fn test_golden_vector_tick_ltp() {
     let json = fs::read_to_string("schema/golden/tick_ltp_golden.json").unwrap();
@@ -97,5 +99,44 @@ fn test_golden_vector_decision_cancelall() {
             assert!(algo_id.is_some());
         }
         _ => panic!("Expected CancelAll variant"),
+    }
+}
+
+#[test]
+fn test_golden_vector_level_map() {
+    let json = fs::read_to_string("schema/golden/level_map_golden.json").unwrap();
+    let map: LevelMap = serde_json::from_str(&json).unwrap();
+    assert!(!map.levels.is_empty());
+    assert!(map.get(LevelId(1)).is_some());
+    assert!(map.get(LevelId(13)).is_some());
+    assert!(map.get(LevelId(999)).is_none());
+    let supports = map.support_levels().count();
+    let resistances = map.resistance_levels().count();
+    assert_eq!(supports + resistances, map.levels.len());
+    assert!(supports > 0);
+    assert!(resistances > 0);
+    for level in &map.levels {
+        assert!(
+            level.band.0 <= level.band.1,
+            "band low must not exceed high"
+        );
+        assert!(level.score <= 4, "confluence score must be 0..=4");
+    }
+}
+
+#[test]
+fn test_golden_vector_options_chain() {
+    let json = fs::read_to_string("schema/golden/options_chain_golden.json").unwrap();
+    let chain: OptionChainSnapshot = serde_json::from_str(&json).unwrap();
+    assert_eq!(chain.underlying.symbol, "RELIANCE");
+    assert_eq!(chain.underlying.exchange, Exchange::Nse);
+    assert_eq!(chain.strikes.len(), 3);
+    for s in &chain.strikes {
+        assert!(s.call_oi >= Decimal::ZERO);
+        assert!(s.put_oi >= Decimal::ZERO);
+        assert!(s.call_iv >= Decimal::ZERO);
+        assert!(s.put_iv >= Decimal::ZERO);
+        assert!(s.call_gamma >= Decimal::ZERO);
+        assert!(s.put_gamma >= Decimal::ZERO);
     }
 }

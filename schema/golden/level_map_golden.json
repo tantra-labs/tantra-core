@@ -1,0 +1,95 @@
+{
+  "levels": [
+    {
+      "id": 1,
+      "kind": "elephant_support1",
+      "side": "support",
+      "band": ["2448.00", "2458.00"],
+      "score": 4
+    },
+    {
+      "id": 2,
+      "kind": "elephant_support2",
+      "side": "support",
+      "band": ["2421.00", "2432.00"],
+      "score": 3
+    },
+    {
+      "id": 3,
+      "kind": "elephant_resistance1",
+      "side": "resistance",
+      "band": ["2490.00", "2500.00"],
+      "score": 4
+    },
+    {
+      "id": 4,
+      "kind": "elephant_resistance2",
+      "side": "resistance",
+      "band": ["2512.00", "2522.00"],
+      "score": 2
+    },
+    {
+      "id": 5,
+      "kind": "previous_day_ohlc",
+      "side": "resistance",
+      "band": ["2488.00", "2488.00"],
+      "score": 1
+    },
+    {
+      "id": 6,
+      "kind": "oi_wall_call",
+      "side": "resistance",
+      "band": ["2500.00", "2500.00"],
+      "score": 3
+    },
+    {
+      "id": 7,
+      "kind": "oi_wall_put",
+      "side": "support",
+      "band": ["2450.00", "2450.00"],
+      "score": 3
+    },
+    {
+      "id": 8,
+      "kind": "gamma_flip",
+      "side": "support",
+      "band": ["2470.00", "2470.00"],
+      "score": 2
+    },
+    {
+      "id": 9,
+      "kind": "gamma_wall_call",
+      "side": "resistance",
+      "band": ["2520.00", "2520.00"],
+      "score": 2
+    },
+    {
+      "id": 10,
+      "kind": "gamma_wall_put",
+      "side": "support",
+      "band": ["2440.00", "2440.00"],
+      "score": 2
+    },
+    {
+      "id": 11,
+      "kind": "max_pain",
+      "side": "support",
+      "band": ["2475.00", "2475.00"],
+      "score": 1
+    },
+    {
+      "id": 12,
+      "kind": "strike_round",
+      "side": "support",
+      "band": ["2500.00", "2500.00"],
+      "score": 1
+    },
+    {
+      "id": 13,
+      "kind": "order_block",
+      "side": "support",
+      "band": ["2462.00", "2472.00"],
+      "score": 2
+    }
+  ]
+}

@@ -33,6 +33,13 @@ fn test_all_canonical_types_implement_valid_json_schema() {
     let _s_scr_group = schema_for!(ScreenerFilterGroup);
     let _s_scr_pred = schema_for!(ScreenerFilterPredicate);
     let _s_metric_def = schema_for!(MetricDefinition);
+    let _s_level = schema_for!(Level);
+    let _s_level_map = schema_for!(LevelMap);
+    let _s_chain = schema_for!(OptionChainSnapshot);
+    let _s_gamma = schema_for!(GammaExposure);
+    let _s_block = schema_for!(OrderBlock);
+    let _s_strategy_signal = schema_for!(StrategySignal);
+    let _s_intent = schema_for!(PositionIntent);
 }
 
 #[test]

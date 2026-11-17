@@ -1,0 +1,49 @@
+{
+  "as_of": "2026-01-15T09:30:00Z",
+  "underlying": {
+    "exchange": "NSE",
+    "symbol": "RELIANCE"
+  },
+  "expiry": "2026-01-29",
+  "strikes": [
+    {
+      "strike": "2450.00",
+      "call_oi": "120000",
+      "put_oi": "140000",
+      "call_oi_change": "8000",
+      "put_oi_change": "-5000",
+      "call_iv": "0.185",
+      "put_iv": "0.178",
+      "call_delta": "0.52",
+      "put_delta": "-0.48",
+      "call_gamma": "0.0045",
+      "put_gamma": "0.0045"
+    },
+    {
+      "strike": "2470.00",
+      "call_oi": "98000",
+      "put_oi": "110000",
+      "call_oi_change": "-2000",
+      "put_oi_change": "6000",
+      "call_iv": "0.192",
+      "put_iv": "0.181",
+      "call_delta": "0.47",
+      "put_delta": "-0.53",
+      "call_gamma": "0.0048",
+      "put_gamma": "0.0048"
+    },
+    {
+      "strike": "2500.00",
+      "call_oi": "150000",
+      "put_oi": "95000",
+      "call_oi_change": "12000",
+      "put_oi_change": "3000",
+      "call_iv": "0.201",
+      "put_iv": "0.175",
+      "call_delta": "0.55",
+      "put_delta": "-0.45",
+      "call_gamma": "0.0042",
+      "put_gamma": "0.0042"
+    }
+  ]
+}
