@@ -9,7 +9,14 @@ Per workspace rule `.agents/rules/gap-tracking.md`:
 
 | # | Title | Severity | Status | Plan |
 |---|-------|----------|--------|------|
-| _(none)_ | — | — | — | — |
+| [0003](0003-value-objects-constructible-invalid.md) | Value objects constructible in invalid states (Price, Quantity, PriceBand, Instrument, InstrumentId) | high | open | [0006](../plans/0006-design-review-2026-11.md) |
+| [0004](0004-wire-schema-evolution-gate.md) | Wire-schema compatibility gate covers only v7/v8 top-level keys; no snapshot for v10 | high | open | [0006](../plans/0006-design-review-2026-11.md) |
+| [0005](0005-typed-port-errors.md) | `PortError` stringly-typed, no `unavailable`, `cancel` takes `&str` | medium | open | [0006](../plans/0006-design-review-2026-11.md) |
+| [0006](0006-canonical-priceband-and-calendar-trait.md) | Duplicated `PriceBand` and calendar traits across four repos | medium | open | [0006](../plans/0006-design-review-2026-11.md) |
+| [0007](0007-calendar-session-model.md) | `TradingCalendar` fixed offset, single unvalidated session, no day navigation | medium | open | [0006](../plans/0006-design-review-2026-11.md) |
+| [0008](0008-money-currency-safety.md) | `Money::notional` hard-codes INR; no currency-checked arithmetic | medium | open | [0006](../plans/0006-design-review-2026-11.md) |
+| [0009](0009-bar-invariants-and-interval.md) | `Bar` lacks interval, OHLC invariants and timestamp semantics | medium | open | [0006](../plans/0006-design-review-2026-11.md) |
+| [0010](0010-decimal-wire-scale-pinning.md) | Inline `Decimal` serialization not pinned to a canonical representation | medium | open | [0006](../plans/0006-design-review-2026-11.md) |
 
 ## Closed Gaps
 

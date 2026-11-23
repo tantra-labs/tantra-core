@@ -17,6 +17,7 @@ references + implementation record); the only remaining roadmap item
 | # | Title | Target Scope | Status |
 |---|-------|--------------|--------|
 | [0005](0005-trade-planner-and-manager.md) | Trade Planner & Trade Manager (entry/SL/TSL/scale-out/sizing, named presets) | `tantra-core` | **P1 Implemented 2026-11-17** (`src/trade_plan.rs` + `src/chart_pattern.rs` + `TradePlanner` + `RiskBudget` weight/ADV; `SCHEMA_VERSION` v10 — T12/TSG prerequisite); P2 `TradeManager` + P3 presets remain — root plan `docs/plans/0008` |
+| [0006](0006-design-review-2026-11.md) | tantra-core design review (2026-11): value-object invariants, wire-schema evolution & canonical types | `tantra-core` | Proposed (2026-11-23) — gaps 0003–0010 + R1–R5 |
 
 ## Implemented Plans
 
