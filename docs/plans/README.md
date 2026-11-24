@@ -15,14 +15,14 @@ references + implementation record); the only remaining roadmap item
 ## Active Plans
 
 | # | Title | Target Scope | Status |
-|---|-------|--------------|--------|
-| [0005](0005-trade-planner-and-manager.md) | Trade Planner & Trade Manager (entry/SL/TSL/scale-out/sizing, named presets) | `tantra-core` | **P1 Implemented 2026-11-17** (`src/trade_plan.rs` + `src/chart_pattern.rs` + `TradePlanner` + `RiskBudget` weight/ADV; `SCHEMA_VERSION` v10 — T12/TSG prerequisite); P2 `TradeManager` + P3 presets remain — root plan `docs/plans/0008` |
+|---|---|---|---|
 | [0006](0006-design-review-2026-11.md) | tantra-core design review (2026-11): value-object invariants, wire-schema evolution & canonical types | `tantra-core` | Proposed (2026-11-23) — gaps 0003–0010 + R1–R5 |
 
 ## Implemented Plans
 
 | # | Title | Target Scope | Implemented In |
-|---|-------|--------------|----------------|
+|---|---|---|---|
+| 0005 | Trade Planner & Trade Manager (entry/SL/TSL/scale-out/sizing, named presets) | `tantra-core`, `tantra-ledger-oms`, `tantra-runtime-config` | Implemented 2026-11-17 (root plan `0008` P1–P3): **P1** `src/trade_plan.rs` + `src/chart_pattern.rs` + `TradePlanner` + `RiskBudget` weight/ADV (`SCHEMA_VERSION` v10); **P2** `TradeManager` state machine (`tantra-ledger-oms/src/trade_manager.rs`, 15 tests + proptest); **P3** canonical TOML presets (`tantra-runtime-config/src/presets.rs`, 5 tests incl. golden vectors). Downstream P3b/P4–P7 tracked in sibling repos; plan doc cleaned up 2026-11-24. |
 | 0003 | Intraday Level-Map, Options-Positioning & Signal Domain Types (Elephant Edge EE+) | `src/levels.rs`, `src/options.rs`, `src/order_blocks.rs`, `src/signals.rs` | Closed 2026-11-17 (T12.1): `LevelKind`/`LevelSide`/`Level`/`LevelMap`/`LevelId`, `OptionChainSnapshot`/`StrikePositioning`/`GammaExposure` + `gamma_flip_strike`, `OrderBlock`, `SignalKind`/`StrategySignal` (→`Signal`)/`PositionIntent`; `SCHEMA_VERSION` v9; tests + golden vectors. Stop/trail live in plan 0005 `src/trade_plan.rs` (reconciliation). |
 | 0001 | Canonical Quant Transform Primitives (Returns, Volatility, Rolling Stats) | `src/quant.rs` | `QuantSeries`, `simple_returns`, `log_returns`, `realized_volatility`, `ewma_volatility`, `rolling_mean`, `rolling_stdev`, `sharpe_ratio`, `max_drawdown`, `correlation`, `beta`, `historical_var`, `historical_cvar`, `tracking_error`, and `QuantError` in `src/quant.rs`; exported from `lib.rs`; golden-vector tests in `tests/quant_tests.rs` (33) and property-based invariants in `tests/quant_proptest.rs`; commits `9ce4880` + `43a11f0`. |
 | 0002 | Call-Site Consolidation: Delegate Downstream Quant Math to `tantra_core::quant` | `tantra-core`, `tantra-market-indicators`, `tantra-agent-analytics` | Closed 2026-11-14 (Phase A audit): no 1:1 delegation sites — streaming f64 indicators and f64 statistical gates vs batch-Decimal `quant`; Phases B–C not applicable. Verdict + matrix in `docs/design/code-quant.md`; gap 0001 closed. |
