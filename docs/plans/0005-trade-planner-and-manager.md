@@ -86,7 +86,7 @@ Tests only in `tests/trade_plan_tests.rs`, `tests/trade_manager_tests.rs`, `test
 
 L0 only: `rust_decimal`, `chrono`, `serde`, `schemars`, `thiserror`.
 Consumers: `tantra-risk` (gap 0005), `tantra-exec` (gap 0003), `tantra-ledger` (gap 0012), `tantra-market` (plan 0002), `tantra-runtime` (plan 0006), `tantra-ffi` (plan 0004), `tantra-agent` (plan 0014).
-Indicator gap: `tantra-market/docs/gaps/0007` (ADR%, Chandelier).
+Indicators: `tantra-market/docs/gaps/README.md#closed-gaps` `0007` (ADR%, Chandelier — closed 2026-11-24).
 
 ## 5. Decisions Locked (Previously Open)
 
