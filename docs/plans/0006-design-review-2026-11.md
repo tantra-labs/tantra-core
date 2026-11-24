@@ -1,6 +1,6 @@
 # 0006 — tantra-core design review (2026-11): value-object invariants, wire-schema evolution & canonical types
 
-**Status**: Proposed (2026-11-23)
+**Status**: In progress (2026-11-24 — Phase A #1 / gap 0003 closed)
 **Scope**: `tantra-core` · **Umbrella**: root `docs/plans/0021-workspace-design-review-2026-11.md`
 
 ## 0. Executive Summary & Objective
@@ -13,7 +13,7 @@ This plan makes the kernel self-validating, makes wire evolution CI-enforced, an
 
 | Gap | Title | Kind | Severity |
 |---|---|---|---|
-| [0003](../gaps/0003-value-objects-constructible-invalid.md) | Value objects constructible in invalid states | design-flaw | high |
+| 0003 (closed — see [gaps README](../gaps/README.md#closed-gaps)) | Value objects constructible in invalid states | design-flaw | high (closed 2026-11-24) |
 | [0004](../gaps/0004-wire-schema-evolution-gate.md) | Wire-schema compatibility gate (v7/v8 only, top-level keys) | deployment | high |
 | [0005](../gaps/0005-typed-port-errors.md) | `PortError` stringly-typed, no `unavailable`, `cancel(&str)` | design-flaw | medium |
 | [0006](../gaps/0006-canonical-priceband-and-calendar-trait.md) | Duplicated `PriceBand` and calendar traits | duplication | medium |
@@ -33,7 +33,7 @@ Plan-only items (no standalone gap doc):
 ## 2. Component Specifications & Phases
 
 ### Phase A — Quick, low-risk fixes
-1. **0003** — private inner fields, `try_new`, `try_from` deserialization for `Price`, `Quantity`, `PriceBand`, `InstrumentId`, `Instrument`. Tests first: `tests/value_object_invariants.rs`.
+1. **0003 (Closed 2026-11-24)** — private inner fields, `try_new`, `try_from` deserialization for `Price`, `Quantity`, `PriceBand`, `InstrumentId`, `Instrument`. Tests first: `tests/value_object_invariants.rs`.
 2. **0005** — `PortError::unavailable`, `kind()`/`is_retryable()`, typed `cancel`, `AccountId` in `PortfolioAccount`.
 3. **0008** — `Money::notional(price, qty, currency)`, checked arithmetic, `quantize`.
 4. **R3** — remove `OrderRequest::new`, drop `v4`/`rng-getrandom` and the getrandom shim, migrate `OrderAck.client_order_id` to `ClientOrderId`.
@@ -66,7 +66,7 @@ Plan-only items (no standalone gap doc):
 
 ## 4. Exit Criteria
 
-1. No value object in `src/types.rs`, `src/instrument.rs` or `src/market.rs` can be constructed or deserialized into an invalid state (`tests/value_object_invariants.rs` green).
+1. ~~No value object in `src/types.rs`, `src/instrument.rs` or `src/market.rs` can be constructed or deserialized into an invalid state (`tests/value_object_invariants.rs` green).~~ (`src/types.rs`, `src/instrument.rs` done in closed 0003; `Bar` tracked in 0009.)
 2. `schema/compatibility/` holds a snapshot for every released `SCHEMA_VERSION`, and CI fails on any breaking recursive-diff change.
 3. `PortError::unavailable` exists and no downstream crate re-defines `PortError`, `PriceBand` or a calendar trait.
 4. `Money` arithmetic is currency-checked; `notional` takes an explicit currency.

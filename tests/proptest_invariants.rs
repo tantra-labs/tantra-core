@@ -16,7 +16,7 @@ proptest! {
         qty_units in 1u64..50_000,
     ) {
         let price_dec = Decimal::from(price_units) + (Decimal::from(price_paise) / Decimal::from(100));
-        let price = Price::new(price_dec);
+        let price = Price::try_new(price_dec).unwrap();
         let qty = Quantity::from_u64(qty_units);
 
         let notional = Money::notional(price, qty);
@@ -42,12 +42,12 @@ proptest! {
         let budget = RiskBudget::new(equity, risk_pct, min_lot)
             .with_max_qty(max_qty);
 
-        let entry = Price::new(Decimal::from(entry_rupees));
+        let entry = Price::from_u64(entry_rupees);
         let stop_distance = Decimal::from(entry_rupees) * (Decimal::from(stop_dist_pct) / Decimal::from(100));
         let stop_loss_val = (Decimal::from(entry_rupees) - stop_distance).max(Decimal::from_str("0.05").unwrap());
-        let stop_loss = Price::new(stop_loss_val);
+        let stop_loss = Price::try_new(stop_loss_val).unwrap();
 
-        let instrument = InstrumentId::new(Exchange::Nse, "PROPSYM");
+        let instrument = InstrumentId::try_new(Exchange::Nse, "PROPSYM").unwrap();
         let req = PositionSizingRequest::new(
             instrument,
             PositionSide::Long,
@@ -116,11 +116,11 @@ proptest! {
         let event = DomainEvent::OrderPlaced {
             order_id: "O-PROP".to_string(),
             client_order_id: Uuid::new_v4(),
-            instrument: InstrumentId::new(Exchange::Nse, "TCS"),
+            instrument: InstrumentId::try_new(Exchange::Nse, "TCS").unwrap(),
             algo_id: "test-algo".to_string(),
             side: OrderSide::Buy,
             quantity: Quantity::from_u64(qty),
-            price: Some(Price::new(Decimal::from(price))),
+            price: Some(Price::from_u64(price)),
             timestamp: Utc::now(),
             trace_context: Some(trace_ctx),
         };

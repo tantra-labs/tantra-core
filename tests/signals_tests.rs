@@ -18,7 +18,7 @@ fn ts() -> DateTime<Utc> {
 }
 
 fn instrument() -> InstrumentId {
-    InstrumentId::new(Exchange::Nse, "RELIANCE")
+    InstrumentId::try_new(Exchange::Nse, "RELIANCE").unwrap()
 }
 
 fn signal() -> StrategySignal {

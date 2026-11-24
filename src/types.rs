@@ -70,6 +70,31 @@ impl FromStr for Exchange {
     }
 }
 
+fn normalize_instrument_symbol(symbol: &str) -> Result<String, CoreError> {
+    if !symbol.is_ascii() || symbol.chars().any(|c| c.is_control() || c == ':') {
+        return Err(CoreError::Validation(format!(
+            "InstrumentId symbol must be printable ASCII without ':': '{symbol}'"
+        )));
+    }
+    let trimmed = symbol.trim();
+    if trimmed.is_empty() {
+        return Err(CoreError::Validation(
+            "InstrumentId symbol cannot be empty".to_string(),
+        ));
+    }
+    Ok(trimmed.to_ascii_uppercase())
+}
+
+#[derive(Deserialize)]
+struct InstrumentIdRaw {
+    exchange: Exchange,
+    symbol: String,
+    #[serde(default)]
+    token: Option<String>,
+    #[serde(default)]
+    isin: Option<String>,
+}
+
 /// Canonical instrument identifier across all feeds and brokers.
 ///
 /// Ordered by `(exchange, symbol, token, isin)` so it can key a `BTreeMap`
@@ -77,28 +102,68 @@ impl FromStr for Exchange {
 #[derive(
     Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, JsonSchema,
 )]
+#[serde(try_from = "InstrumentIdRaw")]
 pub struct InstrumentId {
     /// Exchange venue
-    pub exchange: Exchange,
-    /// Trading symbol (e.g., "RELIANCE", "TCS", "INFY")
-    pub symbol: String,
+    exchange: Exchange,
+    /// Trading symbol (e.g., "RELIANCE", "TCS", "INFY") — always trimmed ASCII uppercase
+    symbol: String,
     /// Broker-assigned instrument token (optional)
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub token: Option<String>,
+    token: Option<String>,
     /// International Securities Identification Number (optional)
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub isin: Option<String>,
+    isin: Option<String>,
+}
+
+impl TryFrom<InstrumentIdRaw> for InstrumentId {
+    type Error = CoreError;
+
+    fn try_from(raw: InstrumentIdRaw) -> Result<Self, Self::Error> {
+        let mut id = Self::try_new(raw.exchange, &raw.symbol)?;
+        if let Some(token) = raw.token {
+            id = id.with_token(token);
+        }
+        if let Some(isin) = raw.isin {
+            id = id.with_isin(isin);
+        }
+        Ok(id)
+    }
 }
 
 impl InstrumentId {
-    /// Create a new instrument ID with exchange and symbol.
-    pub fn new(exchange: Exchange, symbol: impl Into<String>) -> Self {
-        Self {
+    /// Create a validated, normalized instrument ID with exchange and symbol.
+    ///
+    /// Trims surrounding whitespace and normalizes ASCII letters to uppercase.
+    /// Rejects empty, non-ASCII, control characters, or symbols containing `:`.
+    pub fn try_new(exchange: Exchange, symbol: impl AsRef<str>) -> Result<Self, CoreError> {
+        let symbol = normalize_instrument_symbol(symbol.as_ref())?;
+        Ok(Self {
             exchange,
-            symbol: symbol.into().to_uppercase(),
+            symbol,
             token: None,
             isin: None,
-        }
+        })
+    }
+
+    /// Exchange venue.
+    pub const fn exchange(&self) -> Exchange {
+        self.exchange
+    }
+
+    /// Canonical normalized trading symbol (trimmed ASCII uppercase).
+    pub fn symbol(&self) -> &str {
+        &self.symbol
+    }
+
+    /// Broker-assigned instrument token, if known.
+    pub fn token(&self) -> Option<&str> {
+        self.token.as_deref()
+    }
+
+    /// International Securities Identification Number, if known.
+    pub fn isin(&self) -> Option<&str> {
+        self.isin.as_deref()
     }
 
     /// Attach a broker token to the instrument ID.
@@ -127,29 +192,24 @@ impl fmt::Display for InstrumentId {
 `Price` must never be negative, no matter how it is constructed:
 
 - [`Price::try_new`] is the validated primary constructor and unconditionally
-  rejects negative decimals.
-- [`Price::new`] is the panicking-in-debug convenience constructor for call
-  sites that already guarantee positivity (e.g. arithmetic on other positive
-  `Price`s); `debug_assert!` catches any violation in debug builds.
+  rejects negative decimals in both debug and release builds.
+- [`Price::from_u64`] is an infallible constructor for integer prices.
 - The `serde::Deserialize` implementation is a validating wire visitor, so a
   negative price in a JSON payload (LLM output, REST request, replay vector)
   is rejected at the boundary instead of entering the domain.
 */
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, JsonSchema, Default)]
 #[serde(transparent)]
-pub struct Price(pub Decimal);
+pub struct Price(Decimal);
 
 impl Price {
     /// Zero price.
     pub const ZERO: Price = Price(Decimal::ZERO);
 
-    /// Create a new Price from an exact Decimal.
-    ///
-    /// # Panics (debug builds only)
-    /// `debug_assert!`s when `d` is strictly negative; validated-but-infallible
-    /// call sites should prefer [`Price::try_new`]. Deserialized wire payloads
-    /// are validated in both debug and release builds.
-    pub const fn new(d: Decimal) -> Self {
+    /// Crate-internal unchecked constructor for call sites within `tantra-core`
+    /// that mathematically guarantee non-negativity.
+    #[allow(dead_code)]
+    pub(crate) const fn new(d: Decimal) -> Self {
         debug_assert!(
             !d.is_sign_negative() || d.is_zero(),
             "Price cannot be negative"
@@ -157,10 +217,20 @@ impl Price {
         Self(d)
     }
 
+    /// Infallible constructor from integer rupees/units.
+    pub const fn from_u64(n: u64) -> Self {
+        Self(Decimal::from_parts(
+            (n & 0xFFFF_FFFF) as u32,
+            (n >> 32) as u32,
+            0,
+            false,
+            0,
+        ))
+    }
+
     /// Create a validated, non-negative Price from an exact Decimal.
     ///
-    /// This is the canonical constructor: it enforces the non-negative
-    /// invariant unconditionally.
+    /// Normalizes `-0.00` to `Decimal::ZERO`.
     ///
     /// # Errors
     /// Returns [`CoreError::NegativePrice`] when `d` is strictly negative.
@@ -168,7 +238,12 @@ impl Price {
         if d < Decimal::ZERO {
             return Err(CoreError::NegativePrice(d.to_string()));
         }
-        Ok(Self(d))
+        let normalized = if d.is_zero() && d.is_sign_negative() {
+            Decimal::ZERO
+        } else {
+            d
+        };
+        Ok(Self(normalized))
     }
 
     /// Parse price in Rupees (e.g. "2450.75").
@@ -192,6 +267,16 @@ impl Price {
 
     /// Access the underlying exact decimal value.
     pub const fn value(&self) -> Decimal {
+        self.0
+    }
+
+    /// Access the underlying exact decimal value (alias for [`Self::value`]).
+    pub const fn get(&self) -> Decimal {
+        self.0
+    }
+
+    /// Access the underlying exact decimal value (alias for [`Self::value`]).
+    pub const fn as_decimal(&self) -> Decimal {
         self.0
     }
 }
@@ -253,29 +338,23 @@ impl<'de> serde::Deserialize<'de> for Price {
 `Quantity` must never be negative (zero quantities for flat/passthrough
 positions are legal):
 
-- [`Quantity::try_new`] is the validated primary constructor.
-- [`Quantity::new`] `debug_assert!`s in debug builds.
+- [`Quantity::try_new`] is the validated primary constructor in both debug
+  and release builds.
+- [`Quantity::from_u64`] is an infallible constructor for integer quantities.
 - Deserialization rejects negative wire payloads in both debug and release.
 */
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, JsonSchema, Default)]
 #[serde(transparent)]
-pub struct Quantity(pub Decimal);
+pub struct Quantity(Decimal);
 
 impl Quantity {
     /// Zero quantity.
     pub const ZERO: Quantity = Quantity(Decimal::ZERO);
 
-    /// Create quantity from integer units.
-    pub fn from_u64(n: u64) -> Self {
-        Self(Decimal::from(n))
-    }
-
-    /// Create quantity from Decimal.
-    ///
-    /// # Panics (debug builds only)
-    /// `debug_assert!`s when `d` is strictly negative; prefer
-    /// [`Quantity::try_new`] for the validated path.
-    pub const fn new(d: Decimal) -> Self {
+    /// Crate-internal unchecked constructor for call sites within `tantra-core`
+    /// that mathematically guarantee non-negativity.
+    #[allow(dead_code)]
+    pub(crate) const fn new(d: Decimal) -> Self {
         debug_assert!(
             !d.is_sign_negative() || d.is_zero(),
             "Quantity cannot be negative"
@@ -283,7 +362,20 @@ impl Quantity {
         Self(d)
     }
 
+    /// Create quantity from integer units.
+    pub const fn from_u64(n: u64) -> Self {
+        Self(Decimal::from_parts(
+            (n & 0xFFFF_FFFF) as u32,
+            (n >> 32) as u32,
+            0,
+            false,
+            0,
+        ))
+    }
+
     /// Create a validated, non-negative Quantity from an exact Decimal.
+    ///
+    /// Normalizes `-0.00` to `Decimal::ZERO`.
     ///
     /// # Errors
     /// Returns [`CoreError::NegativeQuantity`] when `d` is strictly negative.
@@ -291,7 +383,12 @@ impl Quantity {
         if d < Decimal::ZERO {
             return Err(CoreError::NegativeQuantity(d.to_string()));
         }
-        Ok(Self(d))
+        let normalized = if d.is_zero() && d.is_sign_negative() {
+            Decimal::ZERO
+        } else {
+            d
+        };
+        Ok(Self(normalized))
     }
 
     /// Returns true if quantity is strictly greater than zero.
@@ -301,6 +398,16 @@ impl Quantity {
 
     /// Access the underlying exact decimal value.
     pub const fn value(&self) -> Decimal {
+        self.0
+    }
+
+    /// Access the underlying exact decimal value (alias for [`Self::value`]).
+    pub const fn get(&self) -> Decimal {
+        self.0
+    }
+
+    /// Access the underlying exact decimal value (alias for [`Self::value`]).
+    pub const fn as_decimal(&self) -> Decimal {
         self.0
     }
 
@@ -488,39 +595,128 @@ impl Money {
     /// Calculate notional value from price and quantity.
     pub fn notional(price: Price, qty: Quantity) -> Self {
         Self {
-            amount: price.0 * qty.0,
+            amount: price.value() * qty.value(),
             currency: Currency::Inr,
         }
     }
 }
 
+#[derive(Deserialize)]
+struct PriceBandRaw {
+    lower: Price,
+    upper: Price,
+    reference_price: Price,
+    #[serde(default)]
+    band_pct: Option<Decimal>,
+}
+
 /// Daily scrip-wise or index circuit limit / price band.
+///
+/// Enforces `lower <= reference_price <= upper` and, when present,
+/// `0 < band_pct <= 1` as a fraction (e.g. `0.05` for 5%).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(try_from = "PriceBandRaw")]
 pub struct PriceBand {
     /// Lower price limit (lower circuit)
-    pub lower: Price,
+    lower: Price,
     /// Upper price limit (upper circuit)
-    pub upper: Price,
+    upper: Price,
     /// Previous close or baseline reference price
-    pub reference_price: Price,
+    reference_price: Price,
     /// Band percentage if known (e.g., 0.05 for 5%, 0.10 for 10%, 0.20 for 20%)
-    pub band_pct: Option<Decimal>,
+    band_pct: Option<Decimal>,
+}
+
+impl TryFrom<PriceBandRaw> for PriceBand {
+    type Error = CoreError;
+
+    fn try_from(raw: PriceBandRaw) -> Result<Self, Self::Error> {
+        Self::try_from_parts(raw.lower, raw.upper, raw.reference_price, raw.band_pct)
+    }
 }
 
 impl PriceBand {
-    /// Create a price band with explicit bounds.
-    pub fn new(lower: Price, upper: Price, reference_price: Price) -> Self {
-        Self {
+    /// Create a validated price band with explicit bounds and reference price.
+    ///
+    /// # Errors
+    /// Returns [`CoreError::Validation`] if `lower > upper` or if
+    /// `reference_price` falls outside `[lower, upper]`.
+    pub fn try_new(lower: Price, upper: Price, reference_price: Price) -> Result<Self, CoreError> {
+        Self::try_from_parts(lower, upper, reference_price, None)
+    }
+
+    /// Create a validated price band including optional band percentage fraction (`0 < pct <= 1`).
+    pub fn try_from_parts(
+        lower: Price,
+        upper: Price,
+        reference_price: Price,
+        band_pct: Option<Decimal>,
+    ) -> Result<Self, CoreError> {
+        if lower > upper {
+            return Err(CoreError::Validation(format!(
+                "PriceBand lower ({lower}) exceeds upper ({upper})"
+            )));
+        }
+        if reference_price < lower || reference_price > upper {
+            return Err(CoreError::Validation(format!(
+                "PriceBand reference_price ({reference_price}) must lie within [{lower}, {upper}]"
+            )));
+        }
+        if let Some(pct) = band_pct
+            && (pct <= Decimal::ZERO || pct > Decimal::ONE)
+        {
+            return Err(CoreError::Validation(format!(
+                "PriceBand band_pct ({pct}) must be a fraction in (0, 1]"
+            )));
+        }
+        Ok(Self {
             lower,
             upper,
             reference_price,
-            band_pct: None,
-        }
+            band_pct,
+        })
     }
 
-    /// Check if a given price falls within the inclusive circuit band [lower, upper].
+    /// Attach a validated band percentage fraction (`0 < band_pct <= 1`).
+    pub fn try_with_band_pct(mut self, band_pct: Decimal) -> Result<Self, CoreError> {
+        if band_pct <= Decimal::ZERO || band_pct > Decimal::ONE {
+            return Err(CoreError::Validation(format!(
+                "PriceBand band_pct ({band_pct}) must be a fraction in (0, 1]"
+            )));
+        }
+        self.band_pct = Some(band_pct);
+        Ok(self)
+    }
+
+    /// Lower circuit price limit.
+    pub const fn lower(&self) -> Price {
+        self.lower
+    }
+
+    /// Upper circuit price limit.
+    pub const fn upper(&self) -> Price {
+        self.upper
+    }
+
+    /// Baseline reference price (e.g. previous close).
+    pub const fn reference_price(&self) -> Price {
+        self.reference_price
+    }
+
+    /// Optional band percentage expressed as a fraction in `(0, 1]`.
+    pub const fn band_pct(&self) -> Option<Decimal> {
+        self.band_pct
+    }
+
+    /// Check if a given price falls within the inclusive circuit band `[lower, upper]`.
     pub fn contains(&self, price: Price) -> bool {
         price.0 >= self.lower.0 && price.0 <= self.upper.0
+    }
+}
+
+impl fmt::Display for PriceBand {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "[{}, {}]", self.lower, self.upper)
     }
 }
 

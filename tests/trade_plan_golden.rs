@@ -30,7 +30,7 @@ fn price(s: &str) -> Price {
 }
 
 fn instrument() -> InstrumentId {
-    InstrumentId::new(Exchange::Nse, "RELIANCE")
+    InstrumentId::try_new(Exchange::Nse, "RELIANCE").unwrap()
 }
 
 fn budget() -> RiskBudget {

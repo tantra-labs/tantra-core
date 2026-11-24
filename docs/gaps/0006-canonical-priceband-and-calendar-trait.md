@@ -21,7 +21,7 @@ Circuit-band logic exists twice with different validity rules. A calendar change
 
 ## How to close it
 
-1. After [0003](0003-value-objects-constructible-invalid.md) validates core's `PriceBand`, delete the market-finance `PriceBand` and re-use core's.
+1. Core's `PriceBand` is now validated (closed gap 0003); delete the market-finance `PriceBand` and re-use core's.
 2. Make `MarketCalendar` a supertrait or blanket impl over `TradingCalendar`, or remove it.
 3. Turn chat-tools `CalendarReader` into an adapter wired in the L3 composition root (`tantra-runtime`); drop `RuntimeNseCalendar`.
 4. Land the calendar session-model change ([0007](0007-calendar-session-model.md)) before consumers migrate, so they bind to the final trait shape.
@@ -32,4 +32,4 @@ Circuit-band logic exists twice with different validity rules. A calendar change
 
 - Root gap 0019 (calendar, instrument master and corporate-action single sources).
 - Extends root plan 0019 P4.3 (same class of redefinition, not listed there).
-- [0003](0003-value-objects-constructible-invalid.md), [0007](0007-calendar-session-model.md).
+- Closed gap `0003` (`tantra-core/docs/gaps/README.md#closed-gaps`), [0007](0007-calendar-session-model.md).

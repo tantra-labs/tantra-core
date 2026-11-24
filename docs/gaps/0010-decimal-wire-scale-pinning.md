@@ -27,4 +27,4 @@ A hash-chained audit WAL or prompt replay computed in Rust vs Python (`decimal.D
 ## Related
 
 - Root gap 0015 (pricing and quant math single source) and root gap 0018 (lakehouse manifest/ref byte-compat fixtures).
-- [0004](0004-wire-schema-evolution-gate.md), [0003](0003-value-objects-constructible-invalid.md).
+- [0004](0004-wire-schema-evolution-gate.md), closed gap `0003` (`README.md#closed-gaps`).

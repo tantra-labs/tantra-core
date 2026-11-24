@@ -252,7 +252,7 @@ fn option_chain_snapshot_serde_roundtrip() {
         DateTime::parse_from_rfc3339("2026-01-15T09:30:00Z")
             .unwrap()
             .with_timezone(&Utc),
-        InstrumentId::new(Exchange::Nse, "RELIANCE"),
+        InstrumentId::try_new(Exchange::Nse, "RELIANCE").unwrap(),
         NaiveDate::from_ymd_opt(2026, 1, 29).unwrap(),
         vec![
             make(
@@ -278,5 +278,5 @@ fn option_chain_snapshot_serde_roundtrip() {
     let json = serde_json::to_string(&chain).unwrap();
     let decoded: OptionChainSnapshot = serde_json::from_str(&json).unwrap();
     assert_eq!(chain, decoded);
-    assert_eq!(decoded.underlying.symbol, "RELIANCE");
+    assert_eq!(decoded.underlying.symbol(), "RELIANCE");
 }

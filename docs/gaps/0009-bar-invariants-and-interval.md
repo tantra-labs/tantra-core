@@ -30,4 +30,4 @@ A bar-open vs bar-close stamping mismatch between brokers produces a one-bar loo
 ## Related
 
 - Extends root plan 0019 P4.3 (retire downstream `Bar` duplicate).
-- [0003](0003-value-objects-constructible-invalid.md), [0004](0004-wire-schema-evolution-gate.md).
+- Closed gap `0003` (`README.md#closed-gaps`), [0004](0004-wire-schema-evolution-gate.md).

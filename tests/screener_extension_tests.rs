@@ -59,7 +59,7 @@ fn recursive_and_or_tree_with_crosses_and_classification_roundtrips() {
     root.validate().expect("valid recursive tree");
 
     let req = ScreenerScanRequest {
-        universe: Some(vec![InstrumentId::new(Exchange::Nse, "TCS")]),
+        universe: Some(vec![InstrumentId::try_new(Exchange::Nse, "TCS").unwrap()]),
         filters: root,
         sort: None,
         limit: Some(25),

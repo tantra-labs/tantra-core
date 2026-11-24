@@ -28,4 +28,4 @@ MCX runs 09:00-23:30/23:55 with overnight windows (`close < open`), which `conta
 ## Related
 
 - Root gap 0019 (calendar single source) and root gap 0020 (IST trading day vs UTC).
-- [0006](0006-canonical-priceband-and-calendar-trait.md) depends on this shape; [0003](0003-value-objects-constructible-invalid.md) shares the `try_new` pattern.
+- [0006](0006-canonical-priceband-and-calendar-trait.md) depends on this shape; closed gap `0003` (`README.md#closed-gaps`) shares the `try_new` pattern.

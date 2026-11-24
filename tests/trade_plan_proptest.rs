@@ -16,7 +16,7 @@ fn ts() -> chrono::DateTime<Utc> {
 }
 
 fn instrument() -> InstrumentId {
-    InstrumentId::new(Exchange::Nse, "RELIANCE")
+    InstrumentId::try_new(Exchange::Nse, "RELIANCE").unwrap()
 }
 
 /// Build a `Direct`-subject long market plan. `adr_pct` is left unset so the
@@ -38,7 +38,7 @@ fn plan_long(
         "prop_long",
         1,
         EntryRule::Market,
-        StopRule::Fixed(Price::new(stop)),
+        StopRule::Fixed(Price::try_new(stop).unwrap()),
         TrailSpec {
             rule: TrailRule::Off,
             activation_after_r: Decimal::ONE,
@@ -63,8 +63,8 @@ fn plan_long(
         subject: PlanSubject::Direct,
         instrument: instrument(),
         side: OrderSide::Buy,
-        last_price: Price::new(entry),
-        tick_size: Price::new(tick),
+        last_price: Price::try_new(entry).unwrap(),
+        tick_size: Price::try_new(tick).unwrap(),
         atr: Some(entry / Decimal::from(100)),
         adr_pct: None,
         swing_low: None,
@@ -175,12 +175,12 @@ proptest! {
             let request = PositionSizingRequest::new(
                 instrument(),
                 PositionSide::Long,
-                Price::new(entry_d),
+                Price::try_new(entry_d).unwrap(),
                 Money::inr(equity_d),
                 budget,
                 SizingMethod::FixedFractional { risk_pct },
             )
-            .with_stop_loss(Price::new(stop_d))
+            .with_stop_loss(Price::try_new(stop_d).unwrap())
             .with_adv20(Quantity::from_u64(adv20));
             if let Ok(result) = calculate_position_size(&request) {
                 let weight = result.allocated_notional.amount / equity_d;
@@ -248,7 +248,7 @@ proptest! {
             "prop_short",
             1,
             EntryRule::Market,
-            StopRule::Fixed(Price::new(raw_stop)),
+            StopRule::Fixed(Price::try_new(raw_stop).unwrap()),
             TrailSpec {
                 rule: TrailRule::Off,
                 activation_after_r: Decimal::ONE,
@@ -273,8 +273,8 @@ proptest! {
             subject: PlanSubject::Direct,
             instrument: instrument(),
             side: OrderSide::Sell,
-            last_price: Price::new(last),
-            tick_size: Price::new(tick),
+            last_price: Price::try_new(last).unwrap(),
+            tick_size: Price::try_new(tick).unwrap(),
             atr: Some(last / Decimal::from(100)),
             adr_pct: None,
             swing_low: None,

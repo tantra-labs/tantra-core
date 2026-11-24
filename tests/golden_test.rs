@@ -14,8 +14,8 @@ fn test_golden_vector_tick_ltp() {
             volume,
             ..
         } => {
-            assert_eq!(instrument.symbol, "RELIANCE");
-            assert_eq!(instrument.exchange, Exchange::Nse);
+            assert_eq!(instrument.symbol(), "RELIANCE");
+            assert_eq!(instrument.exchange(), Exchange::Nse);
             assert!(price.is_positive());
             assert!(volume.is_positive());
         }
@@ -36,7 +36,7 @@ fn test_golden_vector_tick_quote() {
             ask_qty,
             ..
         } => {
-            assert_eq!(instrument.symbol, "TCS");
+            assert_eq!(instrument.symbol(), "TCS");
             assert!(bid.is_positive());
             assert!(ask.is_positive());
             assert!(bid_qty.is_positive());
@@ -128,8 +128,8 @@ fn test_golden_vector_level_map() {
 fn test_golden_vector_options_chain() {
     let json = fs::read_to_string("schema/golden/options_chain_golden.json").unwrap();
     let chain: OptionChainSnapshot = serde_json::from_str(&json).unwrap();
-    assert_eq!(chain.underlying.symbol, "RELIANCE");
-    assert_eq!(chain.underlying.exchange, Exchange::Nse);
+    assert_eq!(chain.underlying.symbol(), "RELIANCE");
+    assert_eq!(chain.underlying.exchange(), Exchange::Nse);
     assert_eq!(chain.strikes.len(), 3);
     for s in &chain.strikes {
         assert!(s.call_oi >= Decimal::ZERO);

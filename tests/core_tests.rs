@@ -6,7 +6,7 @@ use tantra_core::*;
 use uuid::Uuid;
 
 fn instrument() -> InstrumentId {
-    InstrumentId::new(Exchange::Nse, "RELIANCE")
+    InstrumentId::try_new(Exchange::Nse, "RELIANCE").unwrap()
 }
 
 #[test]
@@ -14,7 +14,7 @@ fn test_exact_price_math() {
     let p1 = Price::from_rupees("2450.75").unwrap();
     let p2 = Price::from_rupees("0.05").unwrap();
     assert_eq!(
-        Price::new(p1.0 + p2.0),
+        Price::try_new(p1.value() + p2.value()).unwrap(),
         Price::from_rupees("2450.80").unwrap()
     );
 
@@ -32,7 +32,7 @@ fn test_price_band_conformance() {
     let upper = Price::from_rupees("1100.00").unwrap();
     let ref_p = Price::from_rupees("1000.00").unwrap();
 
-    let band = PriceBand::new(lower, upper, ref_p);
+    let band = PriceBand::try_new(lower, upper, ref_p).unwrap();
     assert!(band.contains(Price::from_rupees("900.00").unwrap()));
     assert!(band.contains(Price::from_rupees("1000.00").unwrap()));
     assert!(band.contains(Price::from_rupees("1100.00").unwrap()));
@@ -155,7 +155,7 @@ fn test_priceband_serde_roundtrip() {
     let lower = Price::from_rupees("900.00").unwrap();
     let upper = Price::from_rupees("1100.00").unwrap();
     let ref_p = Price::from_rupees("1000.00").unwrap();
-    let band = PriceBand::new(lower, upper, ref_p);
+    let band = PriceBand::try_new(lower, upper, ref_p).unwrap();
     let json = serde_json::to_string(&band).unwrap();
     let decoded: PriceBand = serde_json::from_str(&json).unwrap();
     assert_eq!(band, decoded);
@@ -262,14 +262,15 @@ fn test_position_side_and_instrument() {
     assert_eq!(PositionSide::Long.opposite(), PositionSide::Short);
     assert_eq!(PositionSide::Short.opposite(), PositionSide::Long);
 
-    let eq = Instrument::equity(
+    let eq = Instrument::try_equity(
         instrument(),
         Quantity::from_u64(1),
         Decimal::from_str("0.05").unwrap(),
-    );
-    assert_eq!(eq.kind, InstrumentKind::Equity);
-    assert!(eq.expiry.is_none());
-    assert!(eq.option_type.is_none());
+    )
+    .unwrap();
+    assert_eq!(eq.kind(), InstrumentKind::Equity);
+    assert!(eq.expiry().is_none());
+    assert!(eq.option_type().is_none());
 
     let json = serde_json::to_string(&eq).unwrap();
     let decoded: Instrument = serde_json::from_str(&json).unwrap();
@@ -802,19 +803,20 @@ fn test_country_code_display_parsing_and_serde() {
 
 #[test]
 fn test_instrument_profile_with_currency_and_country() {
-    let mut inst = Instrument::equity(
+    let mut inst = Instrument::try_equity(
         instrument(),
         Quantity::from_u64(10),
         Decimal::from_str("0.05").unwrap(),
-    );
-    assert_eq!(inst.currency, Currency::Inr);
-    assert_eq!(inst.country, CountryCode::In);
+    )
+    .unwrap();
+    assert_eq!(inst.currency(), Currency::Inr);
+    assert_eq!(inst.country(), CountryCode::In);
 
     inst = inst
         .with_currency(Currency::Usd)
         .with_country(CountryCode::Us);
-    assert_eq!(inst.currency, Currency::Usd);
-    assert_eq!(inst.country, CountryCode::Us);
+    assert_eq!(inst.currency(), Currency::Usd);
+    assert_eq!(inst.country(), CountryCode::Us);
 
     // Serialization roundtrip
     let json = serde_json::to_string(&inst).unwrap();
@@ -832,8 +834,8 @@ fn test_instrument_profile_with_currency_and_country() {
         "tick_size": "0.05"
     });
     let parsed: Instrument = serde_json::from_value(legacy_json).unwrap();
-    assert_eq!(parsed.currency, Currency::Inr);
-    assert_eq!(parsed.country, CountryCode::In);
+    assert_eq!(parsed.currency(), Currency::Inr);
+    assert_eq!(parsed.country(), CountryCode::In);
 }
 
 #[derive(Debug)]
@@ -961,7 +963,7 @@ fn test_exchange_added_nfo_and_cds_variants_match_wire() {
     assert!(Exchange::from_str("OTC").is_err());
 
     // Canonical instrument ids serialize the segment codes on the wire.
-    let id = InstrumentId::new(Exchange::Nfo, "NIFTY24DEC24000CE");
+    let id = InstrumentId::try_new(Exchange::Nfo, "NIFTY24DEC24000CE").unwrap();
     assert_eq!(id.to_string(), "NFO:NIFTY24DEC24000CE");
 }
 

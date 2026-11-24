@@ -18,7 +18,7 @@ fn dec(s: &str) -> Decimal {
 }
 
 fn instrument() -> InstrumentId {
-    InstrumentId::new(Exchange::Nse, "RELIANCE")
+    InstrumentId::try_new(Exchange::Nse, "RELIANCE").unwrap()
 }
 
 fn ts() -> chrono::DateTime<Utc> {

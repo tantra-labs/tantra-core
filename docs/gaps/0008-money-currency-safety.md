@@ -19,7 +19,7 @@ Any USD or other non-INR instrument gets an INR-tagged notional that the risk en
 1. Change to `Money::notional(price, qty, currency)`; deprecate the old signature for one release.
 2. Add `checked_add` / `checked_sub` returning `CoreError::CurrencyMismatch`.
 3. Add `Money::quantize(RoundingStrategy)` using `MinorUnit`.
-4. Make `Money` fields private with accessors, consistent with [0003](0003-value-objects-constructible-invalid.md).
+4. Make `Money` fields private with accessors, consistent with closed gap `0003` (`README.md#closed-gaps`).
 5. Update callers in `tantra-risk` and `tantra-ledger` to pass the instrument currency.
 
 **Verification**: new `tests/money_tests.rs` with `proptest` (`a + b - b == a`; a currency mismatch always errors); `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `make check`, `make test`, `make prod`.
@@ -27,4 +27,4 @@ Any USD or other non-INR instrument gets an INR-tagged notional that the risk en
 ## Related
 
 - Root gap 0014 (unified financial enums and position model).
-- [0003](0003-value-objects-constructible-invalid.md).
+- Closed gap `0003` (`README.md#closed-gaps`).
