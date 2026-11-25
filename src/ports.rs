@@ -11,7 +11,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::instrument::Instrument;
+use crate::instrument::{Instrument, VenueOrderId};
 use crate::market::{Bar, DepthLevel, Tick};
 use crate::order::{ModifyRequest, OrderAck, OrderRequest};
 use crate::signal::Timeframe;
@@ -20,8 +20,23 @@ use crate::types::InstrumentId;
 
 pub use crate::calendar::{SessionWindow, TradingCalendar};
 
+/// Coarse operational classification of a [`PortError`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+#[non_exhaustive]
+pub enum PortErrorKind {
+    /// Transient failure; safe to retry with backoff.
+    Retryable,
+    /// Permanent failure for this request; retrying the same request will fail again.
+    Permanent,
+    /// Capability is unimplemented, unconfigured, or gated upstream (carries a gap reference).
+    Unavailable,
+}
+
 /// Errors a port implementation can return.
-#[derive(Debug, Error, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Error, Serialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum PortError {
     /// The underlying connection could not be established or was lost.
     #[error("connection failed: {0}")]
@@ -36,8 +51,45 @@ pub enum PortError {
     #[error("unsupported: {0}")]
     Unsupported(String),
     /// Calculation or validation failure in port adapter.
-    #[error("sizing failure: {0}")]
+    #[error("calculation failed: {0}")]
     CalculationFailed(String),
+    /// Capability is unavailable or not yet wired (paired with a tracked gap document).
+    #[error("capability '{capability}' unavailable (see {gap_ref})")]
+    Unavailable {
+        /// Identifier of the unavailable capability.
+        capability: &'static str,
+        /// Reference to the gap or plan document tracking closure.
+        gap_ref: &'static str,
+    },
+}
+
+impl PortError {
+    /// Construct an explicit unavailability error referencing the tracking gap document.
+    #[must_use]
+    pub const fn unavailable(capability: &'static str, gap_ref: &'static str) -> Self {
+        Self::Unavailable {
+            capability,
+            gap_ref,
+        }
+    }
+
+    /// Operational error class (`Retryable`, `Permanent`, or `Unavailable`).
+    #[must_use]
+    pub const fn kind(&self) -> PortErrorKind {
+        match self {
+            Self::ConnectionFailed(_) | Self::Timeout => PortErrorKind::Retryable,
+            Self::NotFound(_) | Self::Unsupported(_) | Self::CalculationFailed(_) => {
+                PortErrorKind::Permanent
+            }
+            Self::Unavailable { .. } => PortErrorKind::Unavailable,
+        }
+    }
+
+    /// Whether a caller can safely retry the failed port operation.
+    #[must_use]
+    pub const fn is_retryable(&self) -> bool {
+        matches!(self.kind(), PortErrorKind::Retryable)
+    }
 }
 
 /// Result type for port operations.
@@ -162,8 +214,8 @@ pub trait InstrumentMaster {
 pub trait ExecutionGateway {
     /// Submit a new order.
     fn submit(&mut self, req: &OrderRequest) -> PortResult<OrderAck>;
-    /// Cancel an existing order.
-    fn cancel(&mut self, order_id: &str) -> PortResult<()>;
+    /// Cancel an existing order by broker/venue order ID.
+    fn cancel(&mut self, order_id: &VenueOrderId) -> PortResult<()>;
     /// Modify an existing order.
     fn modify(&mut self, req: &ModifyRequest) -> PortResult<OrderAck>;
 }

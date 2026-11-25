@@ -89,8 +89,8 @@ pub use portfolio::{
 };
 pub use ports::{
     BarReader, BarRequest, ConnectorState, DatedInstrument, DepthReader, ExecutionGateway,
-    InstrumentMaster, MarketDataConnector, MarketEvent, PortError, PortResult, PositionSizer,
-    QuoteReader, SubscriptionParams, TickReader, TickRequest,
+    InstrumentMaster, MarketDataConnector, MarketEvent, PortError, PortErrorKind, PortResult,
+    PositionSizer, QuoteReader, SubscriptionParams, TickReader, TickRequest,
 };
 pub use quant::{
     QuantError, QuantSeries, beta, correlation, ewma_volatility, historical_cvar, historical_var,

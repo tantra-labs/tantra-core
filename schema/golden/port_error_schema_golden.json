@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PortError",
+  "description": "Errors a port implementation can return.",
+  "oneOf": [
+    {
+      "description": "The underlying connection could not be established or was lost.",
+      "type": "object",
+      "required": [
+        "connection_failed"
+      ],
+      "properties": {
+        "connection_failed": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "description": "The operation did not complete in time.",
+      "type": "string",
+      "enum": [
+        "timeout"
+      ]
+    },
+    {
+      "description": "The requested resource does not exist.",
+      "type": "object",
+      "required": [
+        "not_found"
+      ],
+      "properties": {
+        "not_found": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "description": "The operation is not supported by this implementation.",
+      "type": "object",
+      "required": [
+        "unsupported"
+      ],
+      "properties": {
+        "unsupported": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "description": "Calculation or validation failure in port adapter.",
+      "type": "object",
+      "required": [
+        "calculation_failed"
+      ],
+      "properties": {
+        "calculation_failed": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "description": "Capability is unavailable or not yet wired (paired with a tracked gap document).",
+      "type": "object",
+      "required": [
+        "unavailable"
+      ],
+      "properties": {
+        "unavailable": {
+          "type": "object",
+          "required": [
+            "capability",
+            "gap_ref"
+          ],
+          "properties": {
+            "capability": {
+              "description": "Identifier of the unavailable capability.",
+              "type": "string"
+            },
+            "gap_ref": {
+              "description": "Reference to the gap or plan document tracking closure.",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

@@ -311,7 +311,7 @@ fn test_order_event_kind_and_reject_reason() {
 fn test_portfolio_snapshot_roundtrip() {
     let snapshot = PortfolioSnapshot {
         account: PortfolioAccount {
-            account_id: "ACC-1".to_string(),
+            account_id: AccountId::new("ACC-1"),
             mode: PortfolioMode::Paper,
             source: PortfolioSource::Simulated,
         },

@@ -1,6 +1,6 @@
 # 0006 — tantra-core design review (2026-11): value-object invariants, wire-schema evolution & canonical types
 
-**Status**: In progress (2026-11-24 — Phase A #1 / gap 0003 closed)
+**Status**: In progress (2026-11-25 — Phase A #1–#2 / gaps 0003, 0005 closed)
 **Scope**: `tantra-core` · **Umbrella**: root `docs/plans/0021-workspace-design-review-2026-11.md`
 
 ## 0. Executive Summary & Objective
@@ -15,7 +15,7 @@ This plan makes the kernel self-validating, makes wire evolution CI-enforced, an
 |---|---|---|---|
 | 0003 (closed — see [gaps README](../gaps/README.md#closed-gaps)) | Value objects constructible in invalid states | design-flaw | high (closed 2026-11-24) |
 | [0004](../gaps/0004-wire-schema-evolution-gate.md) | Wire-schema compatibility gate (v7/v8 only, top-level keys) | deployment | high |
-| [0005](../gaps/0005-typed-port-errors.md) | `PortError` stringly-typed, no `unavailable`, `cancel(&str)` | design-flaw | medium |
+| 0005 (closed — see [gaps README](../gaps/README.md#closed-gaps)) | `PortError` stringly-typed, no `unavailable`, `cancel(&str)` | design-flaw | medium (closed 2026-11-25) |
 | [0006](../gaps/0006-canonical-priceband-and-calendar-trait.md) | Duplicated `PriceBand` and calendar traits | duplication | medium |
 | [0007](../gaps/0007-calendar-session-model.md) | Calendar session model (fixed offset, single window) | design-flaw | medium |
 | [0008](../gaps/0008-money-currency-safety.md) | `Money::notional` hard-codes INR | design-flaw | medium |
@@ -34,7 +34,7 @@ Plan-only items (no standalone gap doc):
 
 ### Phase A — Quick, low-risk fixes
 1. **0003 (Closed 2026-11-24)** — private inner fields, `try_new`, `try_from` deserialization for `Price`, `Quantity`, `PriceBand`, `InstrumentId`, `Instrument`. Tests first: `tests/value_object_invariants.rs`.
-2. **0005** — `PortError::unavailable`, `kind()`/`is_retryable()`, typed `cancel`, `AccountId` in `PortfolioAccount`.
+2. **0005 (Closed 2026-11-25)** — `PortError::unavailable`, `kind()`/`is_retryable()`, typed `cancel(&VenueOrderId)`, `AccountId` in `PortfolioAccount`. Tests: `tests/ports_error_tests.rs` + `schema/golden/port_error_schema_golden.json`.
 3. **0008** — `Money::notional(price, qty, currency)`, checked arithmetic, `quantize`.
 4. **R3** — remove `OrderRequest::new`, drop `v4`/`rng-getrandom` and the getrandom shim, migrate `OrderAck.client_order_id` to `ClientOrderId`.
 5. **R5** — `OrderRequest` takes `AlgoId`; `Isin::try_new`; private inners with `try_new` for the three id newtypes.

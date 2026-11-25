@@ -52,6 +52,8 @@ fn test_all_canonical_types_implement_valid_json_schema() {
     let _s_pattern = schema_for!(ChartPattern);
     let _s_pattern_kind = schema_for!(PatternKind);
     let _s_pattern_stage = schema_for!(PatternStage);
+    let _s_port_err_kind = schema_for!(PortErrorKind);
+    let _s_port_err = schema_for!(PortError);
 }
 
 #[test]

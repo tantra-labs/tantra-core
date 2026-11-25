@@ -9,6 +9,7 @@ use rust_decimal::Decimal;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::ids::AccountId;
 use crate::instrument::PositionSide;
 use crate::types::{InstrumentId, Money, Price, Quantity};
 
@@ -96,7 +97,7 @@ pub struct PortfolioTotals {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct PortfolioAccount {
     /// Broker or internal account identifier.
-    pub account_id: String,
+    pub account_id: AccountId,
     /// Live, paper, or backtest.
     pub mode: PortfolioMode,
     /// Broker-reconciled or simulated.
