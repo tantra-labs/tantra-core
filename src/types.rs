@@ -41,6 +41,14 @@ impl Exchange {
             Self::Cds => "CDS",
         }
     }
+
+    /// Settlement currency of this venue. Every supported exchange is Indian and settles in INR;
+    /// this is the single place a non-INR venue would declare its currency.
+    pub const fn currency(&self) -> Currency {
+        match self {
+            Self::Nse | Self::Bse | Self::Nfo | Self::Mcx | Self::Cds => Currency::Inr,
+        }
+    }
 }
 
 impl fmt::Display for Exchange {
@@ -579,6 +587,11 @@ impl Money {
     /// Create an amount in a given currency.
     pub const fn new(amount: Decimal, currency: Currency) -> Self {
         Self { amount, currency }
+    }
+
+    /// Zero amount in `currency`, for accumulators.
+    pub const fn zero(currency: Currency) -> Self {
+        Self::new(Decimal::ZERO, currency)
     }
 
     /// Create amount in INR.

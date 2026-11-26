@@ -512,7 +512,7 @@ fn test_fee_breakdown_total_and_with_fee_breakdown() {
         sebi_charges: Money::inr(Decimal::from_str("0.10").unwrap()),
     };
     assert_eq!(
-        breakdown.total(),
+        breakdown.total().unwrap(),
         Money::inr(Decimal::from_str("38.97").unwrap())
     );
 
@@ -528,11 +528,12 @@ fn test_fee_breakdown_total_and_with_fee_breakdown() {
         Utc::now(),
         "default",
     )
-    .with_fee_breakdown(breakdown);
+    .with_fee_breakdown(breakdown)
+    .unwrap();
 
     // `with_fee_breakdown` sets the total fee from the itemized breakdown,
     // so the two never drift apart.
-    assert_eq!(fill.fee, breakdown.total());
+    assert_eq!(fill.fee, breakdown.total().unwrap());
     assert_eq!(fill.fee_breakdown, Some(breakdown));
 
     let flat = FillReport::new(

@@ -1,5 +1,6 @@
 //! Canonical order models, state machine statuses, and execution reports.
 
+use crate::error::CoreError;
 use crate::types::{InstrumentId, Money, Price, Quantity};
 use crate::wire::TraceContext;
 use chrono::{DateTime, Utc};
@@ -430,10 +431,13 @@ impl FillReport {
     }
 
     /// Attaches an itemized fee breakdown, setting [`FillReport::fee`] to its total.
-    pub fn with_fee_breakdown(mut self, breakdown: FeeBreakdown) -> Self {
-        self.fee = breakdown.total();
+    ///
+    /// # Errors
+    /// Returns [`CoreError::CurrencyMismatch`] if the components are not all in one currency.
+    pub fn with_fee_breakdown(mut self, breakdown: FeeBreakdown) -> Result<Self, CoreError> {
+        self.fee = breakdown.total()?;
         self.fee_breakdown = Some(breakdown);
-        self
+        Ok(self)
     }
 
     /// Attach an account ID for lot matching.
@@ -470,18 +474,18 @@ pub struct FeeBreakdown {
 }
 
 impl FeeBreakdown {
-    /// Sums every component into the total fee. All components are expected
-    /// to share one currency (SEBI-regulated Indian venues settle in INR);
-    /// this just adds the exact `Decimal` amounts and keeps the first
-    /// component's currency tag.
-    pub fn total(&self) -> Money {
-        let amount = self.brokerage.amount()
-            + self.stt.amount()
-            + self.exchange_charges.amount()
-            + self.gst.amount()
-            + self.stamp_duty.amount()
-            + self.sebi_charges.amount();
-        Money::new(amount, self.brokerage.currency())
+    /// Sums every component into the total fee using exact `Decimal` arithmetic.
+    ///
+    /// # Errors
+    /// Returns [`CoreError::CurrencyMismatch`] if any component is in a
+    /// different currency than the brokerage component.
+    pub fn total(&self) -> Result<Money, CoreError> {
+        self.brokerage
+            .checked_add(self.stt)?
+            .checked_add(self.exchange_charges)?
+            .checked_add(self.gst)?
+            .checked_add(self.stamp_duty)?
+            .checked_add(self.sebi_charges)
     }
 }
 
