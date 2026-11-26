@@ -475,13 +475,13 @@ impl FeeBreakdown {
     /// this just adds the exact `Decimal` amounts and keeps the first
     /// component's currency tag.
     pub fn total(&self) -> Money {
-        let amount = self.brokerage.amount
-            + self.stt.amount
-            + self.exchange_charges.amount
-            + self.gst.amount
-            + self.stamp_duty.amount
-            + self.sebi_charges.amount;
-        Money::new(amount, self.brokerage.currency)
+        let amount = self.brokerage.amount()
+            + self.stt.amount()
+            + self.exchange_charges.amount()
+            + self.gst.amount()
+            + self.stamp_duty.amount()
+            + self.sebi_charges.amount();
+        Money::new(amount, self.brokerage.currency())
     }
 }
 

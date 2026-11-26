@@ -240,9 +240,9 @@ pub fn calculate_position_size(
         ));
     }
 
-    let equity = request.account_equity.amount;
+    let equity = request.account_equity.amount();
     let entry_p = request.entry_price.value();
-    let currency = request.account_equity.currency;
+    let currency = request.account_equity.currency();
 
     if equity <= Decimal::ZERO {
         return Ok(PositionSizingResult {
@@ -271,7 +271,7 @@ pub fn calculate_position_size(
                 risk_amount / entry_p
             }
         }
-        SizingMethod::FixedNotional { notional } => notional.amount / entry_p,
+        SizingMethod::FixedNotional { notional } => notional.amount() / entry_p,
         SizingMethod::VolatilityTarget {
             target_annual_vol, ..
         } => {
@@ -369,8 +369,8 @@ pub fn calculate_position_size(
     // Check max_position_notional
     if let Some(max_notional) = request.risk_budget.max_position_notional {
         let proposed_notional = rounded_qty * entry_p;
-        if proposed_notional > max_notional.amount {
-            let max_qty_for_notional = (max_notional.amount / entry_p).max(Decimal::ZERO);
+        if proposed_notional > max_notional.amount() {
+            let max_qty_for_notional = (max_notional.amount() / entry_p).max(Decimal::ZERO);
             let allowed_lots = (max_qty_for_notional / lot_size).floor();
             rounded_qty = allowed_lots * lot_size;
             capped = true;
@@ -423,7 +423,7 @@ pub fn calculate_position_size(
     };
 
     let target_weight = if equity > Decimal::ZERO {
-        Some(allocated_notional.amount / equity)
+        Some(allocated_notional.amount() / equity)
     } else {
         None
     };

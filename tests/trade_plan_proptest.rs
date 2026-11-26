@@ -111,9 +111,9 @@ proptest! {
             &|budget| budget,
         ) {
             prop_assert!(
-                plan.risk_at_stake.amount <= risk_amount,
+                plan.risk_at_stake.amount() <= risk_amount,
                 "risk_at_stake {} must be <= equity x risk_pct {}",
-                plan.risk_at_stake.amount,
+                plan.risk_at_stake.amount(),
                 risk_amount
             );
             prop_assert_eq!(
@@ -183,7 +183,7 @@ proptest! {
             .with_stop_loss(Price::try_new(stop_d).unwrap())
             .with_adv20(Quantity::from_u64(adv20));
             if let Ok(result) = calculate_position_size(&request) {
-                let weight = result.allocated_notional.amount / equity_d;
+                let weight = result.allocated_notional.amount() / equity_d;
                 prop_assert!(weight <= max_weight_pct);
                 prop_assert!(result.quantity.value() / adv20_d <= max_adv_pct);
             }

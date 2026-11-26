@@ -564,12 +564,15 @@ impl FromStr for Currency {
 }
 
 /// Explicit monetary amount with currency.
+///
+/// Fields are private so a currency can never be silently swapped; use
+/// [`Money::amount`] / [`Money::currency`] to read them.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct Money {
     /// Exact amount
-    pub amount: Decimal,
+    amount: Decimal,
     /// Currency
-    pub currency: Currency,
+    currency: Currency,
 }
 
 impl Money {
@@ -580,10 +583,7 @@ impl Money {
 
     /// Create amount in INR.
     pub fn inr(amount: Decimal) -> Self {
-        Self {
-            amount,
-            currency: Currency::Inr,
-        }
+        Self::new(amount, Currency::Inr)
     }
 
     /// Zero amount in INR — the default for fields with no cost data yet
@@ -592,11 +592,66 @@ impl Money {
         Self::inr(Decimal::ZERO)
     }
 
+    /// The exact amount, in units of [`Money::currency`].
+    pub const fn amount(&self) -> Decimal {
+        self.amount
+    }
+
+    /// The currency this amount is denominated in.
+    pub const fn currency(&self) -> Currency {
+        self.currency
+    }
+
     /// Calculate notional value from price and quantity.
-    pub fn notional(price: Price, qty: Quantity) -> Self {
-        Self {
-            amount: price.value() * qty.value(),
-            currency: Currency::Inr,
+    ///
+    /// The caller passes the instrument's currency; nothing defaults to INR.
+    pub fn notional(price: Price, qty: Quantity, currency: Currency) -> Self {
+        Self::new(price.value() * qty.value(), currency)
+    }
+
+    /// Add two amounts of the same currency.
+    ///
+    /// # Errors
+    /// [`CoreError::CurrencyMismatch`] if currencies differ; [`CoreError::Validation`] on overflow.
+    pub fn checked_add(self, other: Money) -> Result<Money, CoreError> {
+        self.require_same_currency(other)?;
+        let amount = self
+            .amount
+            .checked_add(other.amount)
+            .ok_or_else(|| CoreError::Validation("money overflow".into()))?;
+        Ok(Money::new(amount, self.currency))
+    }
+
+    /// Subtract two amounts of the same currency.
+    ///
+    /// # Errors
+    /// [`CoreError::CurrencyMismatch`] if currencies differ; [`CoreError::Validation`] on overflow.
+    pub fn checked_sub(self, other: Money) -> Result<Money, CoreError> {
+        self.require_same_currency(other)?;
+        let amount = self
+            .amount
+            .checked_sub(other.amount)
+            .ok_or_else(|| CoreError::Validation("money overflow".into()))?;
+        Ok(Money::new(amount, self.currency))
+    }
+
+    /// Quantize to the currency's minor unit (paise/cents/pence) using `strategy`.
+    pub fn quantize(self, strategy: rust_decimal::RoundingStrategy) -> Money {
+        let dp = u32::from(self.currency.minor_exponent());
+        Money::new(
+            self.amount.round_dp_with_strategy(dp, strategy),
+            self.currency,
+        )
+    }
+
+    fn require_same_currency(self, other: Money) -> Result<(), CoreError> {
+        if self.currency == other.currency {
+            Ok(())
+        } else {
+            Err(CoreError::CurrencyMismatch {
+                left: self.currency,
+                right: other.currency,
+            })
         }
     }
 }

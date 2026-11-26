@@ -246,15 +246,16 @@ fn test_currency_minor_unit_table() {
 #[test]
 fn test_money_carries_currency() {
     let money = Money::new(Decimal::from_str("1234.56").unwrap(), Currency::Inr);
-    assert_eq!(money.currency, Currency::Inr);
-    assert_eq!(money.amount, Decimal::from_str("1234.56").unwrap());
+    assert_eq!(money.currency(), Currency::Inr);
+    assert_eq!(money.amount(), Decimal::from_str("1234.56").unwrap());
 
     let notional = Money::notional(
         Price::from_rupees("2450.75").unwrap(),
         Quantity::from_u64(10),
+        Currency::Inr,
     );
-    assert_eq!(notional.amount, Decimal::from_str("24507.50").unwrap());
-    assert_eq!(notional.currency, Currency::Inr);
+    assert_eq!(notional.amount(), Decimal::from_str("24507.50").unwrap());
+    assert_eq!(notional.currency(), Currency::Inr);
 }
 
 #[test]

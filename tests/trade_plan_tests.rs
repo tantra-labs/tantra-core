@@ -97,8 +97,8 @@ fn plan_market_long_fixed_stop_happy_path() {
     assert_eq!(plan.initial_stop, price("980.00"));
     assert_eq!(plan.risk_per_unit, dec("20.00"));
     assert_eq!(plan.quantity, Quantity::from_u64(50));
-    assert_eq!(plan.risk_at_stake.amount, dec("1000.00"));
-    assert_eq!(plan.risk_at_stake.currency, tantra_core::Currency::Inr);
+    assert_eq!(plan.risk_at_stake.amount(), dec("1000.00"));
+    assert_eq!(plan.risk_at_stake.currency(), tantra_core::Currency::Inr);
     assert_eq!(plan.targets.len(), 1);
     assert_eq!(plan.targets[0].price, price("1040.00"));
     assert_eq!(plan.targets[0].qty, Quantity::from_u64(25));

@@ -19,9 +19,9 @@ proptest! {
         let price = Price::try_new(price_dec).unwrap();
         let qty = Quantity::from_u64(qty_units);
 
-        let notional = Money::notional(price, qty);
-        prop_assert_eq!(notional.amount, price.value() * qty.value());
-        prop_assert_eq!(notional.currency, Currency::Inr);
+        let notional = Money::notional(price, qty, Currency::Inr);
+        prop_assert_eq!(notional.amount(), price.value() * qty.value());
+        prop_assert_eq!(notional.currency(), Currency::Inr);
     }
 
     // 2. Position sizing bounds: risk_at_stake <= equity * risk_pct and quantity <= max_position_qty
@@ -67,8 +67,8 @@ proptest! {
         prop_assert!(res.quantity.value() <= max_qty.value());
 
         // Invariant 2: risk_at_stake <= equity * risk_pct (exact or strictly under due to lot-rounding)
-        let max_allowed_risk = equity.amount * risk_pct;
-        prop_assert!(res.risk_at_stake.amount <= max_allowed_risk);
+        let max_allowed_risk = equity.amount() * risk_pct;
+        prop_assert!(res.risk_at_stake.amount() <= max_allowed_risk);
     }
 
     // 3. TraceContext wire invariance & W3C traceparent roundtrip

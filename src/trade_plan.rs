@@ -655,7 +655,7 @@ impl TradePlanner {
 
         let risk_at_stake = Money::new(
             risk_per_unit * quantity.value(),
-            sizing_budget.equity.currency,
+            sizing_budget.equity.currency(),
         );
         let rationale = format!(
             "stop={} sizing={}",

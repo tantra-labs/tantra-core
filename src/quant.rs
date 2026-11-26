@@ -133,7 +133,7 @@ impl From<&[Price]> for QuantSeries {
 
 impl From<&[Money]> for QuantSeries {
     fn from(money: &[Money]) -> Self {
-        Self(money.iter().map(|m| m.amount).collect())
+        Self(money.iter().map(|m| m.amount()).collect())
     }
 }
 

@@ -1,10 +1,20 @@
 //! Error types for tantra-core.
 
+use crate::types::Currency;
 use thiserror::Error;
 
 /// Core domain errors.
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum CoreError {
+    /// Arithmetic attempted across two different currencies
+    #[error("currency mismatch: {left} vs {right}")]
+    CurrencyMismatch {
+        /// Left-hand currency
+        left: Currency,
+        /// Right-hand currency
+        right: Currency,
+    },
+
     /// Invalid exchange identifier
     #[error("unknown exchange: '{0}' (expected NSE, BSE, NFO, MCX, or CDS)")]
     InvalidExchange(String),
