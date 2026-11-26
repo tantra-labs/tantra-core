@@ -18,7 +18,7 @@ This plan makes the kernel self-validating, makes wire evolution CI-enforced, an
 | 0005 (closed — see [gaps README](../gaps/README.md#closed-gaps)) | `PortError` stringly-typed, no `unavailable`, `cancel(&str)` | design-flaw | medium (closed 2026-11-25) |
 | [0006](../gaps/0006-canonical-priceband-and-calendar-trait.md) | Duplicated `PriceBand` and calendar traits | duplication | medium |
 | [0007](../gaps/0007-calendar-session-model.md) | Calendar session model (fixed offset, single window) | design-flaw | medium |
-| [0008](../gaps/0008-money-currency-safety.md) | `Money::notional` hard-codes INR | design-flaw | medium |
+| 0008 | `Money::notional` hard-codes INR — **closed 2026-11-26** (see [gaps index](../gaps/README.md)) | design-flaw | medium |
 | [0009](../gaps/0009-bar-invariants-and-interval.md) | `Bar` interval, OHLC invariants, timestamp semantics | design-flaw | medium |
 | [0010](../gaps/0010-decimal-wire-scale-pinning.md) | Decimal wire representation not pinned | deployment | medium |
 
@@ -35,7 +35,7 @@ Plan-only items (no standalone gap doc):
 ### Phase A — Quick, low-risk fixes
 1. **0003 (Closed 2026-11-24)** — private inner fields, `try_new`, `try_from` deserialization for `Price`, `Quantity`, `PriceBand`, `InstrumentId`, `Instrument`. Tests first: `tests/value_object_invariants.rs`.
 2. **0005 (Closed 2026-11-25)** — `PortError::unavailable`, `kind()`/`is_retryable()`, typed `cancel(&VenueOrderId)`, `AccountId` in `PortfolioAccount`. Tests: `tests/ports_error_tests.rs` + `schema/golden/port_error_schema_golden.json`.
-3. **0008** — `Money::notional(price, qty, currency)`, checked arithmetic, `quantize`.
+3. ~~**0008**~~ (closed 2026-11-26, `a1448f5`) — `Money::notional(price, qty, currency)`, checked arithmetic, `quantize`.
 4. **R3** — remove `OrderRequest::new`, drop `v4`/`rng-getrandom` and the getrandom shim, migrate `OrderAck.client_order_id` to `ClientOrderId`.
 5. **R5** — `OrderRequest` takes `AlgoId`; `Isin::try_new`; private inners with `try_new` for the three id newtypes.
 
