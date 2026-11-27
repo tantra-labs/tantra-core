@@ -14,7 +14,7 @@ This plan makes the kernel self-validating, makes wire evolution CI-enforced, an
 | Gap | Title | Kind | Severity |
 |---|---|---|---|
 | 0003 (closed — see [gaps README](../gaps/README.md#closed-gaps)) | Value objects constructible in invalid states | design-flaw | high (closed 2026-11-24) |
-| [0004](../gaps/0004-wire-schema-evolution-gate.md) | Wire-schema compatibility gate (v7/v8 only, top-level keys) | deployment | high |
+| 0004 (closed `7926c59`) | Wire-schema compatibility gate (v7/v8 only, top-level keys) | deployment | high |
 | 0005 (closed — see [gaps README](../gaps/README.md#closed-gaps)) | `PortError` stringly-typed, no `unavailable`, `cancel(&str)` | design-flaw | medium (closed 2026-11-25) |
 | [0006](../gaps/0006-canonical-priceband-and-calendar-trait.md) | Duplicated `PriceBand` and calendar traits | duplication | medium |
 | [0007](../gaps/0007-calendar-session-model.md) | Calendar session model (fixed offset, single window) | design-flaw | medium |
@@ -55,7 +55,7 @@ Plan-only items (no standalone gap doc):
 1. **0004** — freeze v9/v10 snapshots, recursive schema diff, auto-enumerated DTO coverage, `WireEnvelope<T>`, single `API_VERSION` policy, N-1/N-2 golden corpora, `domain_schema.json` regeneration check.
 2. **R1** — `default-features = false` on chrono (`serde`, `alloc`), features `schema` and `json`, `clippy.toml` `disallowed_methods` for `Utc::now`, CI matrix (`--no-default-features`, `--target wasm32-unknown-unknown`), versioned/git-tag pinning for consumers, move profiles to the workspace root.
 
-**Gate**: `cargo check --target wasm32-unknown-unknown --profile prod`, `cargo check --no-default-features --profile prod`, `cargo test -p tantra-core --test schema_compat_recursive --profile prod`, `make codegen` leaves a clean `git diff --exit-code schema/`, `make prod`.
+**Gate**: `cargo check --target wasm32-unknown-unknown --profile prod`, `cargo check --no-default-features --profile prod`, `cargo test -p tantra-core --test schema_compat_recursive --profile prod`, `make schema-check` leaves a clean `git diff --exit-code`, `make prod`.
 
 ## 3. Relationship to Other Plans
 

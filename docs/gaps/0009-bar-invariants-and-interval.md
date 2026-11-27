@@ -25,9 +25,9 @@ A bar-open vs bar-close stamping mismatch between brokers produces a one-bar loo
 4. Provide golden vectors per broker normaliser.
 5. Coordinate the provider migration in `tantra-market-store`, which retires its duplicate `Bar` (known root 0019 P4.3).
 
-**Verification**: `proptest` for OHLC ordering and golden JSON in a new `tests/bar_tests.rs`; `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `make check`, `make test`, `make prod`; bump `SCHEMA_VERSION` and freeze the snapshot per [0004](0004-wire-schema-evolution-gate.md).
+**Verification**: `proptest` for OHLC ordering and golden JSON in a new `tests/bar_tests.rs`; `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `make check`, `make test`, `make prod`; bump `SCHEMA_VERSION` and freeze the snapshot per closed gap `0004` (`README.md#closed-gaps`, `schema/compatibility/README.md`).
 
 ## Related
 
 - Extends root plan 0019 P4.3 (retire downstream `Bar` duplicate).
-- Closed gap `0003` (`README.md#closed-gaps`), [0004](0004-wire-schema-evolution-gate.md).
+- Closed gap `0003` (`README.md#closed-gaps`), closed gap `0004` (`README.md#closed-gaps`, `schema/compatibility/README.md`).

@@ -22,9 +22,9 @@ A hash-chained audit WAL or prompt replay computed in Rust vs Python (`decimal.D
 3. Decide and document normalization (`normalize()` vs preserve scale).
 4. Add golden vectors (`1.50`, `1E+2`, `-0`) and a Python parity vector in `tantra-ffi`.
 
-**Verification**: new `tests/decimal_wire_tests.rs` plus `proptest` round-trip; regenerate `schema/domain/domain_schema.json` via `make codegen` and freeze per [0004](0004-wire-schema-evolution-gate.md); `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `make check`, `make test`, `make prod`.
+**Verification**: new `tests/decimal_wire_tests.rs` plus `proptest` round-trip; regenerate `schema/domain/domain_schema.json` via `make schema` and freeze (`make schema-freeze`) per closed gap `0004` (`README.md#closed-gaps`, `schema/compatibility/README.md`); `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `make check`, `make test`, `make prod`.
 
 ## Related
 
 - Root gap 0015 (pricing and quant math single source) and root gap 0018 (lakehouse manifest/ref byte-compat fixtures).
-- [0004](0004-wire-schema-evolution-gate.md), closed gap `0003` (`README.md#closed-gaps`).
+- closed gap `0004` (`README.md#closed-gaps`, `schema/compatibility/README.md`), closed gap `0003` (`README.md#closed-gaps`).

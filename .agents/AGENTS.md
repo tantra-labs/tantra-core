@@ -12,7 +12,7 @@
 * **Single Source of Truth for Wire Contracts**:
   - All public wire types derive `JsonSchema` via `schemars`.
   - OpenAPI 3.1 specifications, JSON schemas, and MCP tool schemas are deterministically generated from these types.
-  - Never edit generated schema files by hand; use `make codegen`.
+  - Never edit generated schema files by hand; use `make schema` (and `make schema-freeze` on every `SCHEMA_VERSION` bump).
 * **Idea Inheritance**:
   - **NautilusTrader**: Strict value objects with explicit units and domain validations.
   - **NoFX**: Closed typed decision grammar (`Decision` enum with `#[serde(deny_unknown_fields)]`).

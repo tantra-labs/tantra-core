@@ -22,8 +22,9 @@ this change.
 - Zero-floats: `rust_decimal` `maths` feature keeps `ln`/`sqrt` pure `Decimal`
   (no `f64` intermediates, even in `quant.rs`).
 - Zero-I/O purity + zero inline tests in `src/` verified.
-- Wire contracts: `SCHEMA_VERSION = 8`, `API_VERSION = "v1"`; generated schema
-  files are never hand-edited (`make codegen`).
+- Wire contracts: `SCHEMA_VERSION = 10` (N-2 window), `REST_API_VERSION = "v2"`
+  (`API_VERSION = "v1"` legacy alias); `schema/domain/domain_schema.json` is
+  generated (`make schema`), never hand-edited; freeze on every bump (`make schema-freeze`).
 - Gap 0001 + plan 0002 closed 2026-11-14: the Phase A audit found **no 1:1 delegation
   sites** (`tantra-market-indicators` streaming f64, `tantra-agent-analytics` statistical
   f64 vs `tantra_core::quant` batch Decimal); verdict + matrix in `code-quant.md`. Delegation
