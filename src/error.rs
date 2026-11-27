@@ -46,4 +46,15 @@ pub enum CoreError {
     /// Validation error for decisions or requests
     #[error("validation failure: {0}")]
     Validation(String),
+
+    /// Wire payload stamped with a schema version outside the supported window
+    #[error("unsupported wire schema version {found} (supported {min}..={max})")]
+    UnsupportedSchemaVersion {
+        /// Version found on the wire
+        found: u32,
+        /// Oldest supported version
+        min: u32,
+        /// Newest supported version
+        max: u32,
+    },
 }

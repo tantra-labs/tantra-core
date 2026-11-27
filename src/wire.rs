@@ -4,6 +4,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::error::CoreError;
+use crate::{MIN_SUPPORTED_SCHEMA_VERSION, SCHEMA_VERSION};
 
 /// Zero-dependency W3C trace context carrier.
 ///
@@ -139,5 +140,72 @@ impl TraceContext {
             span_id: span_id_val.to_be_bytes(),
             trace_flags,
         })
+    }
+}
+
+/// Checks that `found` lies within `MIN_SUPPORTED_SCHEMA_VERSION..=SCHEMA_VERSION`.
+pub fn validate_schema_version(found: u32) -> Result<(), CoreError> {
+    if (MIN_SUPPORTED_SCHEMA_VERSION..=SCHEMA_VERSION).contains(&found) {
+        Ok(())
+    } else {
+        Err(CoreError::UnsupportedSchemaVersion {
+            found,
+            min: MIN_SUPPORTED_SCHEMA_VERSION,
+            max: SCHEMA_VERSION,
+        })
+    }
+}
+
+/// Versioned wire envelope: a payload stamped with the schema version that
+/// produced it. Deserialization fails closed when the stamped version is
+/// outside the supported N-2 window.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(try_from = "RawWireEnvelope<T>")]
+pub struct WireEnvelope<T> {
+    schema_version: u32,
+    payload: T,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RawWireEnvelope<T> {
+    schema_version: u32,
+    payload: T,
+}
+
+impl<T> TryFrom<RawWireEnvelope<T>> for WireEnvelope<T> {
+    type Error = CoreError;
+
+    fn try_from(raw: RawWireEnvelope<T>) -> Result<Self, Self::Error> {
+        validate_schema_version(raw.schema_version)?;
+        Ok(Self {
+            schema_version: raw.schema_version,
+            payload: raw.payload,
+        })
+    }
+}
+
+impl<T> WireEnvelope<T> {
+    /// Wraps `payload`, stamping the current [`SCHEMA_VERSION`].
+    pub fn new(payload: T) -> Self {
+        Self {
+            schema_version: SCHEMA_VERSION,
+            payload,
+        }
+    }
+
+    /// Schema version this envelope was stamped with.
+    pub fn schema_version(&self) -> u32 {
+        self.schema_version
+    }
+
+    /// Borrows the payload.
+    pub fn payload(&self) -> &T {
+        &self.payload
+    }
+
+    /// Consumes the envelope, returning the payload.
+    pub fn into_payload(self) -> T {
+        self.payload
     }
 }

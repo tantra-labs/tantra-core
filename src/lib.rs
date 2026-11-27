@@ -42,6 +42,7 @@ pub mod order_blocks;
 pub mod portfolio;
 pub mod ports;
 pub mod quant;
+pub mod schema;
 pub mod screener;
 pub mod signal;
 pub mod signals;
@@ -117,7 +118,7 @@ pub use trade_plan::{
 pub use types::{
     CountryCode, Currency, Exchange, InstrumentId, MinorUnit, Money, Price, PriceBand, Quantity,
 };
-pub use wire::TraceContext;
+pub use wire::{TraceContext, WireEnvelope};
 
 /// Version of the JSON wire contract, owned here because this crate owns the
 /// wire types.
@@ -162,10 +163,30 @@ pub use wire::TraceContext;
 /// classification VOs (`Sector`, `Industry`, `IndexId`, `MarketCapBucket`)
 /// plus the converged recursive Screener DSL with deserialization shims so
 /// all v8 flat screener payloads continue to deserialize unchanged.
+///
+/// # Bump policy
+///
+/// Bump on ANY wire-visible change (new field, new variant, new type, ...).
+/// Within the supported window (see [`MIN_SUPPORTED_SCHEMA_VERSION`]) only
+/// additive changes are allowed; this is enforced by
+/// `tests/schema_compat_recursive.rs`, which diffs every frozen snapshot in
+/// `schema/compatibility/` against the current generated schema. Run
+/// `make schema-freeze` after every bump to freeze the new snapshot.
 pub const SCHEMA_VERSION: u32 = 10;
 
-/// Semantic version of the REST endpoint surface.
+/// Oldest wire schema version this crate still accepts: the support window is
+/// N-2 (current version and the two preceding ones).
+pub const MIN_SUPPORTED_SCHEMA_VERSION: u32 = SCHEMA_VERSION - 2;
+
+/// Legacy `/api/v1` REST alias version, kept for `tantra-ffi` consumers
+/// (OpenAPI `info.version`, Python export).
+///
+/// New code should use [`REST_API_VERSION`]. This constant will be removed
+/// once `tantra-ffi` migrates.
 pub const API_VERSION: &str = "v1";
+
+/// Canonical REST endpoint surface version (`/api/v2`).
+pub const REST_API_VERSION: &str = "v2";
 
 // Re-export foundational external crates for version consistency
 pub use chrono;
