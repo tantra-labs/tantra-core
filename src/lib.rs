@@ -164,6 +164,10 @@ pub use wire::{TraceContext, WireEnvelope};
 /// plus the converged recursive Screener DSL with deserialization shims so
 /// all v8 flat screener payloads continue to deserialize unchanged.
 ///
+/// v11: added optional `PriceBand::as_of` publication stamp (omitted when
+/// absent) so fail-closed risk gates can refuse stale reference data
+/// (tantra-risk gap 0006).
+///
 /// # Bump policy
 ///
 /// Bump on ANY wire-visible change (new field, new variant, new type, ...).
@@ -172,7 +176,7 @@ pub use wire::{TraceContext, WireEnvelope};
 /// `tests/schema_compat_recursive.rs`, which diffs every frozen snapshot in
 /// `schema/compatibility/` against the current generated schema. Run
 /// `make schema-freeze` after every bump to freeze the new snapshot.
-pub const SCHEMA_VERSION: u32 = 10;
+pub const SCHEMA_VERSION: u32 = 11;
 
 /// Oldest wire schema version this crate still accepts: the support window is
 /// N-2 (current version and the two preceding ones).

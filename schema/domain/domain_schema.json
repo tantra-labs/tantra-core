@@ -4552,6 +4552,14 @@
     "PriceBand": {
       "description": "Daily scrip-wise or index circuit limit / price band.\n\nEnforces `lower <= reference_price <= upper` and, when present, `0 < band_pct <= 1` as a fraction (e.g. `0.05` for 5%).",
       "properties": {
+        "as_of": {
+          "description": "When the exchange published this band (freshness stamp). `None` means unknown freshness; fail-closed gates treat that as stale (tantra-risk gap 0006 `StaleReferenceData`).",
+          "format": "date-time",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "band_pct": {
           "description": "Band percentage if known (e.g., 0.05 for 5%, 0.10 for 10%, 0.20 for 20%)",
           "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
@@ -6800,6 +6808,6 @@
     }
   },
   "description": "Generated from tantra-core derives by `make schema`; do not edit by hand.",
-  "schema_version": 10,
+  "schema_version": 11,
   "title": "tantra-core wire schema"
 }

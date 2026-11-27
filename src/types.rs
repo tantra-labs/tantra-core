@@ -1,5 +1,6 @@
 //! Core value types for Indian equities (NSE, BSE, NFO, MCX, CDS) with Decimal precision.
 
+use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -676,6 +677,8 @@ struct PriceBandRaw {
     reference_price: Price,
     #[serde(default)]
     band_pct: Option<Decimal>,
+    #[serde(default)]
+    as_of: Option<DateTime<Utc>>,
 }
 
 /// Daily scrip-wise or index circuit limit / price band.
@@ -693,13 +696,22 @@ pub struct PriceBand {
     reference_price: Price,
     /// Band percentage if known (e.g., 0.05 for 5%, 0.10 for 10%, 0.20 for 20%)
     band_pct: Option<Decimal>,
+    /// When the exchange published this band (freshness stamp). `None` means
+    /// unknown freshness; fail-closed gates treat that as stale
+    /// (tantra-risk gap 0006 `StaleReferenceData`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    as_of: Option<DateTime<Utc>>,
 }
 
 impl TryFrom<PriceBandRaw> for PriceBand {
     type Error = CoreError;
 
     fn try_from(raw: PriceBandRaw) -> Result<Self, Self::Error> {
-        Self::try_from_parts(raw.lower, raw.upper, raw.reference_price, raw.band_pct)
+        let band = Self::try_from_parts(raw.lower, raw.upper, raw.reference_price, raw.band_pct)?;
+        Ok(match raw.as_of {
+            Some(ts) => band.with_as_of(ts),
+            None => band,
+        })
     }
 }
 
@@ -742,7 +754,20 @@ impl PriceBand {
             upper,
             reference_price,
             band_pct,
+            as_of: None,
         })
+    }
+
+    /// Stamp the band with the time the exchange published it.
+    #[must_use]
+    pub const fn with_as_of(mut self, as_of: DateTime<Utc>) -> Self {
+        self.as_of = Some(as_of);
+        self
+    }
+
+    /// When the band was published, if known.
+    pub const fn as_of(&self) -> Option<DateTime<Utc>> {
+        self.as_of
     }
 
     /// Attach a validated band percentage fraction (`0 < band_pct <= 1`).
